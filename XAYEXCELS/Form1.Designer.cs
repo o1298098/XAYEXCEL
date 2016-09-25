@@ -81,12 +81,16 @@
             // 
             // textBox1
             // 
+            this.textBox1.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBox1.Location = new System.Drawing.Point(16, 20);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(279, 176);
             this.textBox1.TabIndex = 1;
+            this.textBox1.Click += new System.EventHandler(this.textBox1_Click);
             // 
             // groupBox1
             // 
@@ -122,14 +126,14 @@
             // runtsm1
             // 
             this.runtsm1.Name = "runtsm1";
-            this.runtsm1.Size = new System.Drawing.Size(152, 22);
+            this.runtsm1.Size = new System.Drawing.Size(100, 22);
             this.runtsm1.Text = "运行";
             this.runtsm1.Click += new System.EventHandler(this.runtsm_Click);
             // 
             // closetsm
             // 
             this.closetsm.Name = "closetsm";
-            this.closetsm.Size = new System.Drawing.Size(152, 22);
+            this.closetsm.Size = new System.Drawing.Size(100, 22);
             this.closetsm.Text = "退出";
             this.closetsm.Click += new System.EventHandler(this.closetsm_Click);
             // 
@@ -151,10 +155,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(657, 358);
+            this.ContextMenuStrip = this.contextMenuStrip1;
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";

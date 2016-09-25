@@ -22,6 +22,7 @@ namespace XAYEXCELS
     public partial class Form1 : Form
     {
         String arg;
+        string log;
        public Form1(String[] args)
         {
 
@@ -224,10 +225,14 @@ namespace XAYEXCELS
             mail.Send();
             mail = null;
             app = null;
+                log =log+ DateTime.Now.ToLongTimeString()+"/"+ emaildata[4] + "的邮件发送成功\r\n";
+
+
             }
             catch (System.Exception ex)
             {
-                notifyIcon1.ShowBalloonTip(4000, "提示", emaildata[4]+ "邮件发送失败", ToolTipIcon.None);             
+                notifyIcon1.ShowBalloonTip(4000, "提示", emaildata[4]+ "的邮件发送失败", ToolTipIcon.None);
+                log =log+DateTime.Now.ToLongTimeString() +"/"+ emaildata[4] + "的邮件发送失败\r\n";
             }
 
         }
@@ -259,13 +264,14 @@ namespace XAYEXCELS
         private void runtsm_Click(object sender, EventArgs e)
         {
             string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-            DataTable option = ReadFromXml(sysstr+"\\DataTableSET.xml");
+            DataTable option = ReadFromXml(sysstr+ "\\Option.xml");
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();               
              DataTable dt= ImportExcelFile(option.Rows[0].ItemArray[0].ToString());            
             dt.DefaultView.Sort = "业务员,产品名称,数量";
             dt = dt.DefaultView.ToTable();
             string strFileName = option.Rows[1].ItemArray[0].ToString() +"\\"+ DateTime.Now.ToString("yyMMdd") + ".xlsx";
+            string autoemail = option.Rows[2].ItemArray[0].ToString();
             ExportEasy(dt, strFileName);
             DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");           
             for (int k = 0; k < dailidt.Rows.Count; k++)
@@ -284,16 +290,21 @@ namespace XAYEXCELS
                     dtNew.ImportRow(drArr[i]);
 
                 }
-                strFileName = option.Rows[1].ItemArray[0].ToString()+"\\" + daili + DateTime.Now.ToString("yyMMdd") + ".xlsx";
-                string data = email + "☆" + strFileName+ "☆" + emailSubject+ "☆" + emailBody + "☆" +daili;
-                ExportEasy(dtNew, strFileName);
-                t1.IsBackground = true;
-                t1.Start(data);
+                if (autoemail == "True")
+                {
+                    strFileName = option.Rows[1].ItemArray[0].ToString() + "\\" + daili + DateTime.Now.ToString("yyMMdd") + ".xlsx";
+                    string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili;
+                    ExportEasy(dtNew, strFileName);
+                    t1.IsBackground = true;
+                    t1.Start(data);
+                }
+                
             }
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
-            textBox1.Text = "共合并" + dt.Rows.Count + "行"+"，耗时"+seconds+"秒";
+            log=log + DateTime.Now.ToLongTimeString() +"/共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
+            textBox1.Text = log;
             //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
 
 
@@ -311,6 +322,11 @@ namespace XAYEXCELS
                 this.Visible = false;
                 this.ShowInTaskbar = false;
             }
+        }
+
+        private void textBox1_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = log;
         }
     }
    

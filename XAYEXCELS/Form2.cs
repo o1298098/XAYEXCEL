@@ -136,8 +136,11 @@ namespace XAYEXCELS
             dt2.Columns.Add("value");           
             dt2.Rows.Add(TBY.Text);
             dt2.Rows.Add(TYO.Text);
-            WriteToXml(dt2, sysstr + "\\DataTableSET.xml");
-           
+            dt2.Rows.Add(checkBox1.Checked);
+            dt2.Rows.Add(checkBox2.Checked);
+            WriteToXml(dt2, sysstr + "\\Option.xml");
+            this.Close();
+
 
 
         }
@@ -145,9 +148,18 @@ namespace XAYEXCELS
         private void Form2_Load(object sender, EventArgs e)
         {
            
-            DataTable dt = ReadFromXml(sysstr + "\\DataTableSET.xml");
+            DataTable dt = ReadFromXml(sysstr + "\\Option.xml");
             TBY.Text = dt.Rows[0].ItemArray[0].ToString();
             TYO.Text = dt.Rows[1].ItemArray[0].ToString();
+            if (dt.Rows[2].ItemArray[0].ToString() == "True")
+            {
+                checkBox1.Checked = true;
+            }
+            if (dt.Rows[3].ItemArray[0].ToString() == "False")
+            {
+                checkBox2.Checked = false;
+            }
+
             DataTable dt2 = ReadFromXml(sysstr + "\\DataTable.xml");
             dataGridView1.DataSource = dt2;
            
@@ -174,24 +186,37 @@ namespace XAYEXCELS
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox2.Checked) //设置开机自启动  
+            try
             {
-                string path = Application.ExecutablePath;
-                RegistryKey rk = Registry.LocalMachine;
-                RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
-                rk2.SetValue("JcShutdown", path + " -s");
-                rk2.Close();
-                rk.Close();
+                if (checkBox2.Checked) //设置开机自启动  
+                {
+                    string path = Application.ExecutablePath;
+                    RegistryKey rk = Registry.LocalMachine;
+                    RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                    rk2.SetValue("JcShutdown", path + " -s");
+                    rk2.Close();
+                    rk.Close();
+                }
+                else //取消开机自启动  
+                {
+                    string path = Application.ExecutablePath;
+                    RegistryKey rk = Registry.LocalMachine;
+                    RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                    rk2.DeleteValue("JcShutdown", false);
+                    rk2.Close();
+                    rk.Close();
+                }
             }
-            else //取消开机自启动  
-            {              
-                string path = Application.ExecutablePath;
-                RegistryKey rk = Registry.LocalMachine;
-                RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
-                rk2.DeleteValue("JcShutdown", false);
-                rk2.Close();
-                rk.Close();
+            catch (Exception ex)
+            {
+                MessageBox.Show("请在管理员模式下修改才能生效","提示");
+              
             }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
