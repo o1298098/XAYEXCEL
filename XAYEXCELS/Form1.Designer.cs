@@ -39,10 +39,8 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runtsm1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.inputtsm = new System.Windows.Forms.ToolStripMenuItem();
-            this.outputtsm = new System.Windows.Forms.ToolStripMenuItem();
             this.closetsm = new System.Windows.Forms.ToolStripMenuItem();
-            this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.option = new System.Windows.Forms.ToolStripMenuItem();
             this.关于ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -51,6 +49,7 @@
             // 
             // notifyIcon1
             // 
+            this.notifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "CANDA";
@@ -103,7 +102,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.文件ToolStripMenuItem,
-            this.设置ToolStripMenuItem,
+            this.option,
             this.关于ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -115,8 +114,6 @@
             // 
             this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runtsm1,
-            this.inputtsm,
-            this.outputtsm,
             this.closetsm});
             this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
             this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
@@ -125,36 +122,23 @@
             // runtsm1
             // 
             this.runtsm1.Name = "runtsm1";
-            this.runtsm1.Size = new System.Drawing.Size(148, 22);
+            this.runtsm1.Size = new System.Drawing.Size(152, 22);
             this.runtsm1.Text = "运行";
             this.runtsm1.Click += new System.EventHandler(this.runtsm_Click);
-            // 
-            // inputtsm
-            // 
-            this.inputtsm.Name = "inputtsm";
-            this.inputtsm.Size = new System.Drawing.Size(148, 22);
-            this.inputtsm.Text = "输入路径选择";
-            this.inputtsm.Click += new System.EventHandler(this.inputtsm_Click);
-            // 
-            // outputtsm
-            // 
-            this.outputtsm.Name = "outputtsm";
-            this.outputtsm.Size = new System.Drawing.Size(148, 22);
-            this.outputtsm.Text = "输出路径选择";
-            this.outputtsm.Click += new System.EventHandler(this.outputtsm_Click);
             // 
             // closetsm
             // 
             this.closetsm.Name = "closetsm";
-            this.closetsm.Size = new System.Drawing.Size(148, 22);
+            this.closetsm.Size = new System.Drawing.Size(152, 22);
             this.closetsm.Text = "退出";
             this.closetsm.Click += new System.EventHandler(this.closetsm_Click);
             // 
-            // 设置ToolStripMenuItem
+            // option
             // 
-            this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
-            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
-            this.设置ToolStripMenuItem.Text = "设置";
+            this.option.Name = "option";
+            this.option.Size = new System.Drawing.Size(44, 21);
+            this.option.Text = "设置";
+            this.option.Click += new System.EventHandler(this.option_Click);
             // 
             // 关于ToolStripMenuItem
             // 
@@ -169,8 +153,10 @@
             this.ClientSize = new System.Drawing.Size(657, 358);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.contextMenuStrip1.ResumeLayout(false);
@@ -193,10 +179,8 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem inputtsm;
-        private System.Windows.Forms.ToolStripMenuItem 设置ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem option;
         private System.Windows.Forms.ToolStripMenuItem 关于ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem outputtsm;
         private System.Windows.Forms.ToolStripMenuItem closetsm;
         private System.Windows.Forms.ToolStripMenuItem runtsm1;
     }

@@ -11,6 +11,11 @@ using System.IO;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
+using System.Xml;
+using System.Net.Mail;
+using System.Collections;
+using System.Net;
+using System.Threading;
 
 namespace XAYEXCELS
 {
@@ -21,10 +26,10 @@ namespace XAYEXCELS
             InitializeComponent();
         }
         IWorkbook workbook;
-        public System.Data.DataTable ImportExcelFile()
+        public System.Data.DataTable ImportExcelFile(string filepath)
         {
             #region
-            string[] targetfile = Directory.GetFiles("F:\\代理");
+            string[] targetfile = Directory.GetFiles(filepath);
             DataTable drtable = new System.Data.DataTable();
             for (int k = 0; k < targetfile.Length; k++)
             {
@@ -88,7 +93,61 @@ namespace XAYEXCELS
  #endregion           
             return drtable;
         }
-        public static void ExportEasy(DataTable dtSource)
+        public static DataTable ReadFromXml(string address)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                if (!File.Exists(address))
+                {
+                    throw new Exception("文件不存在!");
+                }
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(address);
+                XmlNode root = xmlDoc.SelectSingleNode("DataTable");
+                //读取表名
+                dt.TableName = ((XmlElement)root).GetAttribute("TableName");
+                //Console.WriteLine("读取表名： {0}", dt.TableName);
+                //读取行数
+                int CountOfRows = 0;
+                if (!int.TryParse(((XmlElement)root).
+                 GetAttribute("CountOfRows").ToString(), out CountOfRows))
+                {
+                    throw new Exception("行数转换失败");
+                }
+                //读取列数
+                int CountOfColumns = 0;
+                if (!int.TryParse(((XmlElement)root).
+                 GetAttribute("CountOfColumns").ToString(), out CountOfColumns))
+                {
+                    throw new Exception("列数转换失败");
+                }
+                //从第一行中读取记录的列名
+                foreach (XmlAttribute xa in root.ChildNodes[0].Attributes)
+                {
+                    dt.Columns.Add(xa.Value);
+                    //Console.WriteLine("建立列： {0}", xa.Value);
+                }
+                //从后面的行中读取行信息
+                for (int i = 1; i < root.ChildNodes.Count; i++)
+                {
+                    string[] array = new string[root.ChildNodes[0].Attributes.Count];
+                    for (int j = 0; j < array.Length; j++)
+                    {
+                        array[j] = root.ChildNodes[i].Attributes[j].Value.ToString();
+                    }
+                    dt.Rows.Add(array);
+                    //Console.WriteLine("行插入成功");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new DataTable();
+            }
+            return dt;
+        }
+        public static void ExportEasy(DataTable dtSource,string strFileName)
         {
             XSSFWorkbook workbook1 = new XSSFWorkbook();
             ISheet sheet = workbook1.CreateSheet();           
@@ -110,8 +169,7 @@ namespace XAYEXCELS
             styleh.FillPattern = FillPattern.SolidForeground;
             styleh.FillBackgroundColor = NPOI.HSSF.Util.HSSFColor.LightTurquoise.Index;
             //font.IsBold =true;
-            styleh.SetFont(font);
-            string strFileName = "F:\\代理\\生成\\" + DateTime.Now.ToString("yyMMdd")+".xlsx";
+            styleh.SetFont(font);            
             foreach (DataColumn column in dtSource.Columns)
             {
                 dataRow.CreateCell(column.Ordinal).SetCellValue(column.ColumnName);
@@ -143,6 +201,20 @@ namespace XAYEXCELS
             }
             
         }
+        public static void MultiSendEmail(object data)
+        {
+            string emailstr = data as string;
+            string[] emaildata = emailstr.Split('☆');
+            Microsoft.Office.Interop.Outlook.Application app = new Microsoft.Office.Interop.Outlook.Application();
+            Microsoft.Office.Interop.Outlook.MailItem mail = (Microsoft.Office.Interop.Outlook.MailItem)app.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+            mail.To = emaildata[0];
+            mail.Attachments.Add(emaildata[1], Microsoft.Office.Interop.Outlook.OlAttachmentType.olByValue, Type.Missing, Type.Missing);
+            mail.Subject = emaildata[2];
+            mail.Body = emaildata[3];
+            //mail.Display(true);
+            mail.Send();
+
+        }
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             this.Visible = true;
@@ -157,33 +229,12 @@ namespace XAYEXCELS
                 this.notifyIcon1.Visible = true;
                 this.ShowInTaskbar = false;
             }
-        }     
-
-       
-        //protected override void OnClosing(CancelEventArgs e)
-        //{
-        //    this.ShowInTaskbar = false;
-        //    this.WindowState = FormWindowState.Minimized;
-        //    e.Cancel = true;
-        //}
-
+        }            
+     
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
             this.Close();
-        }
-
-      
-
-        private void inputtsm_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void outputtsm_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        }     
         private void closetsm_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -191,22 +242,50 @@ namespace XAYEXCELS
 
         private void runtsm_Click(object sender, EventArgs e)
         {
-           
+            DataTable option = ReadFromXml("DataTableSET.xml");
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();
-            string[] a = System.IO.Directory.GetFiles("F:\\代理");          
-             DataTable dt= ImportExcelFile();            
+            stopwatch.Start();               
+             DataTable dt= ImportExcelFile(option.Rows[0].ItemArray[0].ToString());            
             dt.DefaultView.Sort = "业务员,产品名称,数量";
             dt = dt.DefaultView.ToTable();
-            ExportEasy(dt);
+            string strFileName = option.Rows[1].ItemArray[0].ToString() +"\\"+ DateTime.Now.ToString("yyMMdd") + ".xlsx";
+            ExportEasy(dt, strFileName);
+            DataTable dailidt = ReadFromXml("DataTable.xml");           
+            for (int k = 0; k < dailidt.Rows.Count; k++)
+            {
+                Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
+                string daili = dailidt.Rows[k][0].ToString();
+                string email= dailidt.Rows[k][1].ToString();
+                string emailSubject = dailidt.Rows[k][2].ToString();
+                string emailBody = dailidt.Rows[k][3].ToString();
+                DataRow[] drArr = dt.Select("业务员 LIKE '"+ daili + "%'");
+                DataTable dtNew = dt.Clone();
+                if (drArr.Length == 0)               
+                    continue;               
+                for (int i = 0; i < drArr.Length; i++)
+                {
+                    dtNew.ImportRow(drArr[i]);
+
+                }
+                strFileName = option.Rows[1].ItemArray[0].ToString()+"\\" + daili + DateTime.Now.ToString("yyMMdd") + ".xlsx";
+                string data = email + "☆" + strFileName+ "☆" + emailSubject+ "☆" + emailBody;
+                ExportEasy(dtNew, strFileName);
+                t1.IsBackground = true;
+                t1.Start(data);
+            }
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
             textBox1.Text = "共合并" + dt.Rows.Count + "行"+"，耗时"+seconds+"秒";
+            notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
 
 
         }
 
+        private void option_Click(object sender, EventArgs e)
+        {
+            new Form2().Show();
+        }
     }
    
   }

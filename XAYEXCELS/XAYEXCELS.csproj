@@ -49,10 +49,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>49946CA928925AD07F2054D60A2DD7C93249DBC2</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>0AE31978302D4C70E1DAA361C8588032FB65936E</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>XAYEXCELS_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -62,19 +63,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\Net40\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>I:\gongcheng\ExcelWorkbook4\ExcelWorkbook4\Net40\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="NPOI">
-      <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.dll</HintPath>
+      <HintPath>I:\gongcheng\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.OOXML">
-      <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.OOXML.dll</HintPath>
+      <HintPath>I:\gongcheng\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.OOXML.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.OpenXml4Net">
-      <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.OpenXml4Net.dll</HintPath>
+      <HintPath>I:\gongcheng\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.OpenXml4Net.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.OpenXmlFormats">
-      <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.OpenXmlFormats.dll</HintPath>
+      <HintPath>I:\gongcheng\ExcelWorkbook4\ExcelWorkbook4\Net40\NPOI.OpenXmlFormats.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -95,10 +99,19 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form2.Designer.cs">
+      <DependentUpon>Form2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form2.resx">
+      <DependentUpon>Form2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -118,7 +131,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="XAYEXCELS_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -137,6 +149,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XAYEXCEL\XAYEXCEL.csproj">
+      <Project>{3eeef0b2-12c2-4bb6-80cd-9a04221374d9}</Project>
+      <Name>XAYEXCEL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
