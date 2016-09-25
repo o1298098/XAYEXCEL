@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -136,6 +137,7 @@ namespace XAYEXCELS
             dt2.Rows.Add(TBY.Text);
             dt2.Rows.Add(TYO.Text);
             WriteToXml(dt2, "DataTableSET.xml");
+           
 
 
         }
@@ -167,6 +169,28 @@ namespace XAYEXCELS
         {
             folderBrowserDialog1.ShowDialog();
             TYO.Text = folderBrowserDialog1.SelectedPath;
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked) //设置开机自启动  
+            {
+                string path = Application.ExecutablePath;
+                RegistryKey rk = Registry.LocalMachine;
+                RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                rk2.SetValue("JcShutdown", path + " -s");
+                rk2.Close();
+                rk.Close();
+            }
+            else //取消开机自启动  
+            {              
+                string path = Application.ExecutablePath;
+                RegistryKey rk = Registry.LocalMachine;
+                RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
+                rk2.DeleteValue("JcShutdown", false);
+                rk2.Close();
+                rk.Close();
+            }
         }
     }
 }

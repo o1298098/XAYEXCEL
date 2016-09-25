@@ -21,8 +21,15 @@ namespace XAYEXCELS
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        String arg;
+       public Form1(String[] args)
         {
+
+            if (args.Length > 0)
+            {
+                //获取启动时的命令行参数  
+                arg = args[0];
+            }
             InitializeComponent();
         }
         IWorkbook workbook;
@@ -213,6 +220,8 @@ namespace XAYEXCELS
             mail.Body = emaildata[3];
             //mail.Display(true);
             mail.Send();
+            mail = null;
+            app = null;
 
         }
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -285,6 +294,15 @@ namespace XAYEXCELS
         private void option_Click(object sender, EventArgs e)
         {
             new Form2().Show();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (arg != null)
+            {
+                this.Visible = false;
+                this.ShowInTaskbar = false;
+            }
         }
     }
    
