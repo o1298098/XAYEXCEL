@@ -208,10 +208,12 @@ namespace XAYEXCELS
             }
             
         }
-        public static void MultiSendEmail(object data)
+        public void MultiSendEmail(object data)
         {
             string emailstr = data as string;
             string[] emaildata = emailstr.Split('☆');
+            try
+            {            
             Microsoft.Office.Interop.Outlook.Application app = new Microsoft.Office.Interop.Outlook.Application();
             Microsoft.Office.Interop.Outlook.MailItem mail = (Microsoft.Office.Interop.Outlook.MailItem)app.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
             mail.To = emaildata[0];
@@ -222,6 +224,11 @@ namespace XAYEXCELS
             mail.Send();
             mail = null;
             app = null;
+            }
+            catch (System.Exception ex)
+            {
+                notifyIcon1.ShowBalloonTip(4000, "提示", emaildata[4]+ "邮件发送失败", ToolTipIcon.None);             
+            }
 
         }
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -251,7 +258,8 @@ namespace XAYEXCELS
 
         private void runtsm_Click(object sender, EventArgs e)
         {
-            DataTable option = ReadFromXml("DataTableSET.xml");
+            string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+            DataTable option = ReadFromXml(sysstr+"\\DataTableSET.xml");
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();               
              DataTable dt= ImportExcelFile(option.Rows[0].ItemArray[0].ToString());            
@@ -259,7 +267,7 @@ namespace XAYEXCELS
             dt = dt.DefaultView.ToTable();
             string strFileName = option.Rows[1].ItemArray[0].ToString() +"\\"+ DateTime.Now.ToString("yyMMdd") + ".xlsx";
             ExportEasy(dt, strFileName);
-            DataTable dailidt = ReadFromXml("DataTable.xml");           
+            DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");           
             for (int k = 0; k < dailidt.Rows.Count; k++)
             {
                 Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
@@ -277,7 +285,7 @@ namespace XAYEXCELS
 
                 }
                 strFileName = option.Rows[1].ItemArray[0].ToString()+"\\" + daili + DateTime.Now.ToString("yyMMdd") + ".xlsx";
-                string data = email + "☆" + strFileName+ "☆" + emailSubject+ "☆" + emailBody;
+                string data = email + "☆" + strFileName+ "☆" + emailSubject+ "☆" + emailBody + "☆" +daili;
                 ExportEasy(dtNew, strFileName);
                 t1.IsBackground = true;
                 t1.Start(data);
@@ -286,7 +294,7 @@ namespace XAYEXCELS
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
             textBox1.Text = "共合并" + dt.Rows.Count + "行"+"，耗时"+seconds+"秒";
-            notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
+            //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
 
 
         }

@@ -15,6 +15,7 @@ namespace XAYEXCELS
 {
     public partial class Form2 : Form
     {
+        string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
         public Form2()
         {
             InitializeComponent();
@@ -130,13 +131,12 @@ namespace XAYEXCELS
         private void button1_Click(object sender, EventArgs e)
         {
             DataTable dt = dataGridView1.DataSource as DataTable;
-            WriteToXml(dt, "DataTable.xml");             
-            DataTable dt2 = new DataTable("option");
-            WriteToXml(dt2, "DataTableSET.xml");           
+            WriteToXml(dt, sysstr + "\\DataTable.xml");             
+            DataTable dt2 = new DataTable("option");          
             dt2.Columns.Add("value");           
             dt2.Rows.Add(TBY.Text);
             dt2.Rows.Add(TYO.Text);
-            WriteToXml(dt2, "DataTableSET.xml");
+            WriteToXml(dt2, sysstr + "\\DataTableSET.xml");
            
 
 
@@ -144,10 +144,11 @@ namespace XAYEXCELS
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            DataTable dt = ReadFromXml("DataTableSET.xml");
+           
+            DataTable dt = ReadFromXml(sysstr + "\\DataTableSET.xml");
             TBY.Text = dt.Rows[0].ItemArray[0].ToString();
             TYO.Text = dt.Rows[1].ItemArray[0].ToString();
-            DataTable dt2 = ReadFromXml("DataTable.xml");
+            DataTable dt2 = ReadFromXml(sysstr + "\\DataTable.xml");
             dataGridView1.DataSource = dt2;
            
         }    
@@ -156,7 +157,7 @@ namespace XAYEXCELS
         {
 
             DataTable dt = dataGridView1.DataSource as DataTable;          
-            WriteToXml(dt, "DataTable.xml");           
+            WriteToXml(dt, sysstr + "\\DataTable.xml");           
         }
 
         private void button2_Click(object sender, EventArgs e)
