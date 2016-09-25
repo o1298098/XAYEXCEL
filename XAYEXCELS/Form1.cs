@@ -225,14 +225,14 @@ namespace XAYEXCELS
             mail.Send();
             mail = null;
             app = null;
-                log =log+ DateTime.Now.ToLongTimeString()+"/"+ emaildata[4] + "的邮件发送成功\r\n";
+                log =log+ DateTime.Now.ToLongTimeString()+"  "+ emaildata[4] + "的邮件发送成功\r\n";
 
 
             }
             catch (System.Exception ex)
             {
                 notifyIcon1.ShowBalloonTip(4000, "提示", emaildata[4]+ "的邮件发送失败", ToolTipIcon.None);
-                log =log+DateTime.Now.ToLongTimeString() +"/"+ emaildata[4] + "的邮件发送失败\r\n";
+                log =log+DateTime.Now.ToLongTimeString() +"  "+ emaildata[4] + "的邮件发送失败\r\n";
             }
 
         }
@@ -303,7 +303,7 @@ namespace XAYEXCELS
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
-            log=log + DateTime.Now.ToLongTimeString() +"/共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
+            log=log + DateTime.Now.ToLongTimeString() +"  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
             textBox1.Text = log;
             //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
 
