@@ -350,6 +350,10 @@ namespace XAYEXCELS
             string strFileName = totaldir + "\\汇总表"+ DateTime.Now.ToString("yyMMdd") + ".xlsx";
             string autoemail = option.Rows[2].ItemArray[0].ToString();
             ExportEasy(dt, strFileName);
+            stopwatch.Stop();
+            TimeSpan timeSpan = stopwatch.Elapsed;
+            double seconds = timeSpan.TotalSeconds;
+            log = log + DateTime.Now.ToLongTimeString() + "  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
             DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");           
             for (int k = 0; k < dailidt.Rows.Count; k++)
             {
@@ -379,11 +383,7 @@ namespace XAYEXCELS
                     t1.Start(data);
                 }
                 
-            }
-            stopwatch.Stop();
-            TimeSpan timeSpan = stopwatch.Elapsed;
-            double seconds = timeSpan.TotalSeconds;
-            log=log + DateTime.Now.ToLongTimeString() +"  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
+            }            
             textBox1.Text = log;
             //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
 
