@@ -42,8 +42,6 @@
             this.closetsm = new System.Windows.Forms.ToolStripMenuItem();
             this.option = new System.Windows.Forms.ToolStripMenuItem();
             this.关于ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.restart = new System.Windows.Forms.ToolStripMenuItem();
-            this.restarttbn = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -62,23 +60,22 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runtsm,
-            this.restart,
             this.toolStripMenuItem3});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(125, 70);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 48);
             this.contextMenuStrip1.Text = "菜单";
             // 
             // runtsm
             // 
             this.runtsm.Name = "runtsm";
-            this.runtsm.Size = new System.Drawing.Size(124, 22);
+            this.runtsm.Size = new System.Drawing.Size(100, 22);
             this.runtsm.Text = "运行";
             this.runtsm.Click += new System.EventHandler(this.runtsm_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(124, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(100, 22);
             this.toolStripMenuItem3.Text = "退出";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
@@ -121,7 +118,6 @@
             // 
             this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runtsm1,
-            this.restarttbn,
             this.closetsm});
             this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
             this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
@@ -130,14 +126,14 @@
             // runtsm1
             // 
             this.runtsm1.Name = "runtsm1";
-            this.runtsm1.Size = new System.Drawing.Size(152, 22);
+            this.runtsm1.Size = new System.Drawing.Size(100, 22);
             this.runtsm1.Text = "运行";
             this.runtsm1.Click += new System.EventHandler(this.runtsm_Click);
             // 
             // closetsm
             // 
             this.closetsm.Name = "closetsm";
-            this.closetsm.Size = new System.Drawing.Size(152, 22);
+            this.closetsm.Size = new System.Drawing.Size(100, 22);
             this.closetsm.Text = "退出";
             this.closetsm.Click += new System.EventHandler(this.closetsm_Click);
             // 
@@ -154,20 +150,6 @@
             this.关于ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.关于ToolStripMenuItem.Text = "关于";
             // 
-            // restart
-            // 
-            this.restart.Name = "restart";
-            this.restart.Size = new System.Drawing.Size(124, 22);
-            this.restart.Text = "重发邮件";
-            this.restart.Click += new System.EventHandler(this.restart_Click);
-            // 
-            // restarttbn
-            // 
-            this.restarttbn.Name = "restarttbn";
-            this.restarttbn.Size = new System.Drawing.Size(152, 22);
-            this.restarttbn.Text = "重发邮件";
-            this.restarttbn.Click += new System.EventHandler(this.restart_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -181,7 +163,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "拆分代发";
+            this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.contextMenuStrip1.ResumeLayout(false);
@@ -208,8 +190,6 @@
         private System.Windows.Forms.ToolStripMenuItem 关于ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closetsm;
         private System.Windows.Forms.ToolStripMenuItem runtsm1;
-        private System.Windows.Forms.ToolStripMenuItem restart;
-        private System.Windows.Forms.ToolStripMenuItem restarttbn;
     }
 }
 
