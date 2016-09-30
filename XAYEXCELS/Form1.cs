@@ -66,7 +66,6 @@ namespace XAYEXCELS
             }
                 ISheet sheet = workbook.GetSheetAt(0);
                 IRow headerRow = sheet.GetRow(0);
-                //XSSFFormulaEvaluator e = new XSSFFormulaEvaluator(workbook);
                 int cellCount = 18;
                 int rowCount = sheet.LastRowNum;
                 if (k == 0)
@@ -84,7 +83,7 @@ namespace XAYEXCELS
                 try
                 {
 
-                    for (int i = (sheet.FirstRowNum + 2); i <= rowCount; i++)
+                    for (int i = (sheet.FirstRowNum + 1); i <= rowCount; i++)
                 {
                     IRow row = sheet.GetRow(i);
                     DataRow dataRow = drtable.NewRow();
@@ -104,17 +103,12 @@ namespace XAYEXCELS
                                     }
                                     else if (row.GetCell(j).CellType == CellType.String)
                                     {
-                                        dataRow[j] = row.GetCell(j).StringCellValue;
+                                        dataRow[j] = row.GetCell(j).StringCellValue.Trim();
                                     }
-                                    else if (row.GetCell(j).CellType == CellType.Formula&&j==5)
+                                    else if (row.GetCell(j).CellType == CellType.Formula&&(j==5|| j == 16))
                                     {
                                         dataRow[j] = row.GetCell(j).NumericCellValue;
-                                    }
-                                    else if (row.GetCell(j).CellType == CellType.Formula && j == 16)
-                                    {
-                                        dataRow[j] = row.GetCell(j).NumericCellValue;
-                                    }
-
+                                    }                                    
 
                                 }
 
@@ -126,9 +120,9 @@ namespace XAYEXCELS
                 }
                 catch (Exception ex)
                 {
-                    notifyIcon1.ShowBalloonTip(2000, "提示", "运行失败，excel文件单元格格式有误", ToolTipIcon.None);
+                    notifyIcon1.ShowBalloonTip(2000, "提示", "运行失败，excel文件单元格格式有误", ToolTipIcon.Error);
                     log = log  +DateTime.Now.ToLongTimeString() + "  运行失败，excel文件单元格格式有误\r\n";
-                    throw;
+                    break;
                 }
 
             }
@@ -189,27 +183,42 @@ namespace XAYEXCELS
             }
             return dt;
         }
-        public static void ExportEasy(DataTable dtSource,string strFileName)
+        public  void ExportEasy(DataTable dtSource,string strFileName,string exceltype)
         {
             XSSFWorkbook workbook1 = new XSSFWorkbook();
             ISheet sheet = workbook1.CreateSheet();           
             IRow dataRow = sheet.CreateRow(0);
             ICellStyle style = workbook1.CreateCellStyle();
-            ICellStyle styleh = workbook1.CreateCellStyle();
+            ICellStyle style2 = workbook1.CreateCellStyle();
+            ICellStyle styleh = workbook1.CreateCellStyle();           
             IFont font = workbook1.CreateFont();
             dataRow.Height = 28 * 20;
             //sheet.DefaultColumnWidth = 10 * 256;
+            sheet.SetColumnWidth(0, 10 * 256);
+            sheet.SetColumnWidth(1, 11 * 256);
+            sheet.SetColumnWidth(2, 9 * 256);
+            if (exceltype == "2")
+            {
+                sheet.SetColumnWidth(11, 20 * 256);
+            }
             sheet.SetColumnWidth(13, 13 * 256);
             sheet.SetColumnWidth(14, 15 * 256);
             sheet.SetColumnWidth(15, 13 * 256);
-            sheet.SetColumnWidth(16, 15 * 256);
+            sheet.SetColumnWidth(16, 15 * 256);           
             style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
             style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
             style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
-            style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;             
+            style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;            
             font.FontName = "宋体";           
             font.FontHeightInPoints = 10;
             style.SetFont(font);
+            style2.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            style2.VerticalAlignment = VerticalAlignment.Center;
+            style2.SetFont(font);
             styleh.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
             styleh.VerticalAlignment = VerticalAlignment.Center;
             styleh.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.CornflowerBlue.Index;
@@ -225,33 +234,66 @@ namespace XAYEXCELS
                 dataRow.Cells[column.Ordinal].CellStyle = styleh;
             }
 
-
-            //填充内容
-            for (int i = 0; i < dtSource.Rows.Count; i++)
+            try
             {
-                dataRow = sheet.CreateRow(i + 1);
-                for (int j = 0; j < dtSource.Columns.Count; j++)
+                //填充内容
+                for (int i = 0; i < dtSource.Rows.Count; i++)
                 {
-                    dataRow.CreateCell(j).SetCellValue(dtSource.Rows[i][j].ToString());
-                    dataRow.Cells[j].CellStyle = style;
-                   
+                    dataRow = sheet.CreateRow(i + 1);
+                    for (int j = 0; j < dtSource.Columns.Count; j++)
+                    {
+                    string dtcellvalue = dtSource.Rows[i][j].ToString();
+                        if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8) && dtcellvalue != "")
+                        {
+
+                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.Cells[j].CellStyle = style2;
+                           
+
+
+                        }
+                        else if (exceltype == "2" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
+                        {
+
+                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.Cells[j].CellStyle = style2;
+                            
+                        }
+                        else
+                        {
+                            dataRow.CreateCell(j).SetCellValue(dtcellvalue);
+                            dataRow.Cells[j].CellStyle = style;                           
+
+                        }
+                        //
+
+
+                    }
+
                 }
-              
             }
+            catch (Exception ex)
+            {
+
+                log = log + DateTime.Now.ToLongTimeString() + "  金额单元格格式有误\r\n";
+                notifyIcon1.ShowBalloonTip(2000, "提示", "金额单元格格式有误", ToolTipIcon.Error);
+                throw ex;
+            }
+
             //sheet.ForceFormulaRecalculation = true;
-            sheet.CreateFreezePane(3,0,4,0);
-            CellRangeAddress range = CellRangeAddress.ValueOf("A1:P1");
-            sheet.SetAutoFilter(range);
+            sheet.CreateFreezePane(3, 0, 4, 0);
+                CellRangeAddress range = CellRangeAddress.ValueOf("A1:P1");
+                sheet.SetAutoFilter(range);
 
-            //保存
-            using (MemoryStream ms = new MemoryStream())
-            {
-                using (FileStream fs = new FileStream(strFileName, FileMode.Create, FileAccess.Write))
+                //保存
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    workbook1.Write(fs);
+                    using (FileStream fs = new FileStream(strFileName, FileMode.Create, FileAccess.Write))
+                    {
+                        workbook1.Write(fs);
+                    }
                 }
-            }
-            
+           
         }
         public void MultiSendEmail(object data)
         {
@@ -345,11 +387,11 @@ namespace XAYEXCELS
                 return;
             }
 
-            dt.DefaultView.Sort = "业务员,产品名称,数量";
+            dt.DefaultView.Sort = "业务员 DESC";
             dt = dt.DefaultView.ToTable();
             string strFileName = totaldir + "\\汇总表"+ DateTime.Now.ToString("yyMMdd") + ".xlsx";
             string autoemail = option.Rows[2].ItemArray[0].ToString();
-            ExportEasy(dt, strFileName);
+            ExportEasy(dt, strFileName,"1");
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
@@ -363,7 +405,17 @@ namespace XAYEXCELS
                 string email2 = dailidt.Rows[k][2].ToString();
                 string emailSubject = dailidt.Rows[k][3].ToString();
                 string emailBody = dailidt.Rows[k][4].ToString();
-                DataRow[] drArr = dt.Select("业务员 LIKE '"+ daili.Substring(0,1) + "%'");
+                string daili2= dailidt.Rows[k][5].ToString();
+                DataRow[] drArr;
+                if (daili2 == "")
+                {
+                     drArr = dt.Select("业务员 LIKE '" + daili.Substring(0, 1) + "%'");
+                }
+                else
+                {
+                    drArr = dt.Select("业务员 LIKE '" + daili2.Substring(0, 1) + "%' and 业务员 Like '%" + daili+ "%' ");
+                }
+               
                 DataTable dtNew = dt.Clone();
                 if (drArr.Length == 0)               
                     continue;               
@@ -375,7 +427,7 @@ namespace XAYEXCELS
                 dtNew.Columns.Remove("拿货单价");
                 dtNew.Columns.Remove("注释");
                 strFileName = dailidir + "\\" + daili +"单号(" +DateTime.Now.ToString("M.dd") + ").xlsx";
-                ExportEasy(dtNew, strFileName);
+                ExportEasy(dtNew, strFileName,"2");
                 if (autoemail == "True")
                 {                  
                     string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" +email2;
