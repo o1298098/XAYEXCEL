@@ -33,17 +33,22 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.runtsm = new System.Windows.Forms.ToolStripMenuItem();
+            this.restart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runtsm1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.restarttbn = new System.Windows.Forms.ToolStripMenuItem();
             this.closetsm = new System.Windows.Forms.ToolStripMenuItem();
             this.option = new System.Windows.Forms.ToolStripMenuItem();
             this.关于ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.restart = new System.Windows.Forms.ToolStripMenuItem();
-            this.restarttbn = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnrun = new System.Windows.Forms.Button();
+            this.sendbtn = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.sendrtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendtms = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -62,10 +67,11 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runtsm,
+            this.sendrtn,
             this.restart,
             this.toolStripMenuItem3});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(125, 70);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(125, 92);
             this.contextMenuStrip1.Text = "菜单";
             // 
             // runtsm
@@ -74,6 +80,13 @@
             this.runtsm.Size = new System.Drawing.Size(124, 22);
             this.runtsm.Text = "运行";
             this.runtsm.Click += new System.EventHandler(this.runtsm_Click);
+            // 
+            // restart
+            // 
+            this.restart.Name = "restart";
+            this.restart.Size = new System.Drawing.Size(124, 22);
+            this.restart.Text = "重发邮件";
+            this.restart.Click += new System.EventHandler(this.restart_Click);
             // 
             // toolStripMenuItem3
             // 
@@ -121,6 +134,7 @@
             // 
             this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runtsm1,
+            this.sendtms,
             this.restarttbn,
             this.closetsm});
             this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
@@ -131,8 +145,15 @@
             // 
             this.runtsm1.Name = "runtsm1";
             this.runtsm1.Size = new System.Drawing.Size(152, 22);
-            this.runtsm1.Text = "运行";
+            this.runtsm1.Text = "拆分订单";
             this.runtsm1.Click += new System.EventHandler(this.runtsm_Click);
+            // 
+            // restarttbn
+            // 
+            this.restarttbn.Name = "restarttbn";
+            this.restarttbn.Size = new System.Drawing.Size(152, 22);
+            this.restarttbn.Text = "重发邮件";
+            this.restarttbn.Click += new System.EventHandler(this.restart_Click);
             // 
             // closetsm
             // 
@@ -154,19 +175,48 @@
             this.关于ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.关于ToolStripMenuItem.Text = "关于";
             // 
-            // restart
+            // btnrun
             // 
-            this.restart.Name = "restart";
-            this.restart.Size = new System.Drawing.Size(124, 22);
-            this.restart.Text = "重发邮件";
-            this.restart.Click += new System.EventHandler(this.restart_Click);
+            this.btnrun.Location = new System.Drawing.Point(57, 100);
+            this.btnrun.Name = "btnrun";
+            this.btnrun.Size = new System.Drawing.Size(143, 35);
+            this.btnrun.TabIndex = 5;
+            this.btnrun.Text = "拆分订单";
+            this.btnrun.UseVisualStyleBackColor = true;
+            this.btnrun.Click += new System.EventHandler(this.runtsm_Click);
             // 
-            // restarttbn
+            // sendbtn
             // 
-            this.restarttbn.Name = "restarttbn";
-            this.restarttbn.Size = new System.Drawing.Size(152, 22);
-            this.restarttbn.Text = "重发邮件";
-            this.restarttbn.Click += new System.EventHandler(this.restart_Click);
+            this.sendbtn.Location = new System.Drawing.Point(57, 177);
+            this.sendbtn.Name = "sendbtn";
+            this.sendbtn.Size = new System.Drawing.Size(143, 35);
+            this.sendbtn.TabIndex = 6;
+            this.sendbtn.Text = "发送邮件";
+            this.sendbtn.UseVisualStyleBackColor = true;
+            this.sendbtn.Click += new System.EventHandler(this.sendbtn_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(57, 257);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(143, 35);
+            this.button3.TabIndex = 7;
+            this.button3.Text = "失败重发";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.restart_Click);
+            // 
+            // sendrtn
+            // 
+            this.sendrtn.Name = "sendrtn";
+            this.sendrtn.Size = new System.Drawing.Size(124, 22);
+            this.sendrtn.Text = "发送邮件";
+            // 
+            // sendtms
+            // 
+            this.sendtms.Name = "sendtms";
+            this.sendtms.Size = new System.Drawing.Size(152, 22);
+            this.sendtms.Text = "发送邮件";
+            this.sendtms.Click += new System.EventHandler(this.sendbtn_Click);
             // 
             // Form1
             // 
@@ -174,6 +224,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(657, 358);
             this.ContextMenuStrip = this.contextMenuStrip1;
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.sendbtn);
+            this.Controls.Add(this.btnrun);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -210,6 +263,11 @@
         private System.Windows.Forms.ToolStripMenuItem runtsm1;
         private System.Windows.Forms.ToolStripMenuItem restart;
         private System.Windows.Forms.ToolStripMenuItem restarttbn;
+        private System.Windows.Forms.ToolStripMenuItem sendrtn;
+        private System.Windows.Forms.ToolStripMenuItem sendtms;
+        private System.Windows.Forms.Button btnrun;
+        private System.Windows.Forms.Button sendbtn;
+        private System.Windows.Forms.Button button3;
     }
 }
 

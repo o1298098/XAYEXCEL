@@ -17,6 +17,8 @@ using System.Collections;
 using System.Net;
 using System.Threading;
 using NPOI.SS.Util;
+using System.IO.Pipes;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace XAYEXCELS
 {
@@ -25,7 +27,9 @@ namespace XAYEXCELS
         String arg;
         string log;
         string[] restartemail=new string[30];
+        string[] emailarg = new string[1000];
         int time1;
+        int emailtime;
        public Form1(String[] args)
         {
 
@@ -35,7 +39,37 @@ namespace XAYEXCELS
                 arg = args[0];
             }
             InitializeComponent();
+            Thread pipethread = new Thread(new ThreadStart(receiveStream));
+            pipethread.IsBackground = true;
+            pipethread.Start();
+            
+
+
         }
+
+        private void receiveStream()
+        {
+        while (true)
+        {
+            using (NamedPipeClientStream pipeStream = new NamedPipeClientStream("messagepipe"))
+            {
+
+                pipeStream.Connect();
+                pipeStream.ReadMode = PipeTransmissionMode.Byte;
+                Byte[] bytes = new byte[1024*1000];
+                BinaryFormatter bf = new BinaryFormatter();
+                pipeStream.Read(bytes, 0, bytes.Length);
+                MemoryStream ms = new MemoryStream(bytes);
+                ms.Position = 0;
+                DataTable dt = bf.Deserialize(ms) as DataTable;
+                    //ExportEasy(dt, "F:\\代理\\2016.10\\10日\\汇总表\\测试.xls", "0");
+                    ExcelExport(dt);
+                }
+
+                Thread.Sleep(1000);
+          }
+      }
+
         IWorkbook workbook;
         public System.Data.DataTable ImportExcelFile(string filepath)
         {
@@ -185,7 +219,7 @@ namespace XAYEXCELS
         }
         public  void ExportEasy(DataTable dtSource,string strFileName,string exceltype)
         {
-            XSSFWorkbook workbook1 = new XSSFWorkbook();
+            HSSFWorkbook workbook1 = new HSSFWorkbook();
             ISheet sheet = workbook1.CreateSheet();           
             IRow dataRow = sheet.CreateRow(0);
             ICellStyle style = workbook1.CreateCellStyle();
@@ -355,91 +389,104 @@ namespace XAYEXCELS
             string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
             DataTable option = ReadFromXml(sysstr + "\\Option.xml");
             string filepathInput = option.Rows[0].ItemArray[0].ToString();
-            string filepath = option.Rows[1].ItemArray[0].ToString();            
-            string daydir = filepath + "\\" + DateTime.Now.Year.ToString() + "\\" + DateTime.Now.Month.ToString("") + "月" + "\\" + DateTime.Now.Date.ToString("M.dd");
+            string filepath = option.Rows[1].ItemArray[0].ToString();
+            string daydir = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日";
             string targetdir = daydir + "\\" + "源文件";
-            string dailidir = daydir + "\\" + "单号表";
-            string totaldir = daydir + "\\" + "汇总表";
             if (!Directory.Exists(targetdir))
                 Directory.CreateDirectory(targetdir);
-            if (!Directory.Exists(dailidir))
-                Directory.CreateDirectory(dailidir);
-            if (!Directory.Exists(totaldir))
-                Directory.CreateDirectory(totaldir);
             List<string> files = new List<string>(Directory.GetFiles(filepathInput));
             files.ForEach(c =>
             {
-                string destFile = Path.Combine(new string[] { targetdir, Path.GetFileName(c) });              
+                string destFile = Path.Combine(new string[] { targetdir, Path.GetFileName(c) });
                 if (File.Exists(destFile))
                 {
                     File.Delete(destFile);
                 }
                 File.Move(c, destFile);
             });
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            stopwatch.Start();               
-            DataTable dt= ImportExcelFile(targetdir);
+            DataTable dt = ImportExcelFile(targetdir);
             if (dt.Rows.Count == 0)
             {
                 log = log + DateTime.Now.ToLongTimeString() + "  源文件为空\r\n";
                 textBox1.Text = log;
-                notifyIcon1.ShowBalloonTip(3000, "提示","请添加源文件", ToolTipIcon.None);
+                notifyIcon1.ShowBalloonTip(3000, "提示", "请添加源文件", ToolTipIcon.None);
                 return;
             }
 
+            ExcelExport(dt);
+            textBox1.Text = log;
+
+        }
+
+        private void ExcelExport(DataTable dt)
+        {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+            string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+            DataTable option = ReadFromXml(sysstr + "\\Option.xml");
+            string filepathInput = option.Rows[0].ItemArray[0].ToString();
+            string filepath = option.Rows[1].ItemArray[0].ToString();
+            string daydir = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日";           
+            string dailidir = daydir + "\\" + "单号表";
+            string totaldir = daydir + "\\" + "汇总表";
+            emailtime = 0;            
+            if (!Directory.Exists(dailidir))
+                Directory.CreateDirectory(dailidir);
+            if (!Directory.Exists(totaldir))
+                Directory.CreateDirectory(totaldir);           
             dt.DefaultView.Sort = "业务员 DESC";
             dt = dt.DefaultView.ToTable();
-            string strFileName = totaldir + "\\汇总表"+ DateTime.Now.ToString("yyMMdd") + ".xlsx";
+            string strFileName = totaldir + "\\汇总表" + DateTime.Now.ToString("yyMMdd") + ".xls";
             string autoemail = option.Rows[2].ItemArray[0].ToString();
-            ExportEasy(dt, strFileName,"1");
+            ExportEasy(dt, strFileName, "1");
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
             log = log + DateTime.Now.ToLongTimeString() + "  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
-            DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");           
+            DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");
             for (int k = 0; k < dailidt.Rows.Count; k++)
             {
                 Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
                 string daili = dailidt.Rows[k][0].ToString();
-                string email= dailidt.Rows[k][1].ToString();
+                string email = dailidt.Rows[k][1].ToString();
                 string email2 = dailidt.Rows[k][2].ToString();
                 string emailSubject = dailidt.Rows[k][3].ToString();
                 string emailBody = dailidt.Rows[k][4].ToString();
-                string daili2= dailidt.Rows[k][5].ToString();
+                string daili2 = dailidt.Rows[k][5].ToString();
                 DataRow[] drArr;
                 if (daili2 == "")
                 {
-                     drArr = dt.Select("业务员 LIKE '" + daili.Substring(0, 1) + "%'");
+                    drArr = dt.Select("业务员 LIKE '" + daili.Substring(0, 1) + "%'");
                 }
                 else
                 {
-                    drArr = dt.Select("业务员 LIKE '" + daili2.Substring(0, 1) + "%' and 业务员 Like '%" + daili+ "%' ");
+                    drArr = dt.Select("业务员 LIKE '" + daili2.Substring(0, 1) + "%' and 业务员 Like '%" + daili + "%' ");
                 }
-               
+
                 DataTable dtNew = dt.Clone();
-                if (drArr.Length == 0)               
-                    continue;               
+                if (drArr.Length == 0)
+                    continue;
                 for (int i = 0; i < drArr.Length; i++)
                 {
                     dtNew.ImportRow(drArr[i]);
                 }
                 dtNew.Columns.Remove("结算费用");
                 dtNew.Columns.Remove("拿货单价");
-                dtNew.Columns.Remove("注释");
-                strFileName = dailidir + "\\" + daili +"单号(" +DateTime.Now.ToString("M.dd") + ").xlsx";
-                ExportEasy(dtNew, strFileName,"2");
+                //dtNew.Columns.Remove("注释");
+                strFileName = dailidir + "\\" + emailSubject + "(" + DateTime.Now.ToString("M.dd") + ").xls";
+                ExportEasy(dtNew, strFileName, "2");
+                string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" + email2;
+                emailarg[emailtime] = data;
+                emailtime++;
                 if (autoemail == "True")
-                {                  
-                    string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" +email2;
+                {
                     t1.IsBackground = true;
                     t1.Start(data);
                 }
-                
-            }            
-            textBox1.Text = log;
+
+            }
+            
             //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
-
-
         }
 
         private void option_Click(object sender, EventArgs e)
@@ -473,6 +520,17 @@ namespace XAYEXCELS
                 t2.Start(restartemail[i]);
             }
           
+        }
+
+        private void sendbtn_Click(object sender, EventArgs e)
+        {
+            int time = emailtime;           
+            for (int i = 0; i < time; i++)
+            {
+                Thread t = new Thread(new ParameterizedThreadStart(MultiSendEmail));
+                t.IsBackground = true;
+                t.Start(emailarg[i]);
+            }
         }
     }
    
