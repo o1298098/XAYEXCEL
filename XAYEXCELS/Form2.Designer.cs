@@ -42,6 +42,8 @@
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button4 = new System.Windows.Forms.Button();
+            this.rbyewu = new System.Windows.Forms.RadioButton();
+            this.rbshouhou = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -137,6 +139,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.rbshouhou);
+            this.groupBox2.Controls.Add(this.rbyewu);
             this.groupBox2.Controls.Add(this.checkBox2);
             this.groupBox2.Controls.Add(this.checkBox1);
             this.groupBox2.Controls.Add(this.dataGridView1);
@@ -150,8 +154,6 @@
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Checked = true;
-            this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox2.Location = new System.Drawing.Point(132, 330);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(96, 16);
@@ -179,6 +181,27 @@
             this.button4.Text = "取消";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // rbyewu
+            // 
+            this.rbyewu.AutoSize = true;
+            this.rbyewu.Location = new System.Drawing.Point(252, 329);
+            this.rbyewu.Name = "rbyewu";
+            this.rbyewu.Size = new System.Drawing.Size(59, 16);
+            this.rbyewu.TabIndex = 12;
+            this.rbyewu.Text = "业务部";
+            this.rbyewu.UseVisualStyleBackColor = true;
+            // 
+            // rbshouhou
+            // 
+            this.rbshouhou.AutoSize = true;
+            this.rbshouhou.Location = new System.Drawing.Point(326, 329);
+            this.rbshouhou.Name = "rbshouhou";
+            this.rbshouhou.Size = new System.Drawing.Size(47, 16);
+            this.rbshouhou.TabIndex = 13;
+            this.rbshouhou.TabStop = true;
+            this.rbshouhou.Text = "售后";
+            this.rbshouhou.UseVisualStyleBackColor = true;
             // 
             // Form2
             // 
@@ -219,5 +242,7 @@
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.RadioButton rbshouhou;
+        private System.Windows.Forms.RadioButton rbyewu;
     }
 }

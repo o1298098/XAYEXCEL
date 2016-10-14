@@ -138,11 +138,10 @@ namespace XAYEXCELS
             dt2.Rows.Add(TYO.Text);
             dt2.Rows.Add(checkBox1.Checked);
             dt2.Rows.Add(checkBox2.Checked);
+            dt2.Rows.Add(rbyewu.Checked);
+            dt2.Rows.Add(rbshouhou.Checked);
             WriteToXml(dt2, sysstr + "\\Option.xml");
             this.Close();
-
-
-
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -155,9 +154,17 @@ namespace XAYEXCELS
             {
                 checkBox1.Checked = true;
             }
-            if (dt.Rows[3].ItemArray[0].ToString() == "False")
+            if (dt.Rows[3].ItemArray[0].ToString() == "True")
             {
-                checkBox2.Checked = false;
+                checkBox2.Checked = true;
+            }
+            if (dt.Rows[4].ItemArray[0].ToString() == "True")
+            {
+                rbyewu.Checked = true;
+            }
+            if (dt.Rows[5].ItemArray[0].ToString() == "True")
+            {
+                rbshouhou.Checked = true;
             }
 
             DataTable dt2 = ReadFromXml(sysstr + "\\DataTable.xml");
