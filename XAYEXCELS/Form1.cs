@@ -79,7 +79,10 @@ namespace XAYEXCELS
                             str = str.Replace(str2, "");
                             str2 = str2.Replace(" ", "");
                             dt.Rows[i]["地址"] = str2 + str;
-                            dt.Rows[i]["产品名称"] = dt.Rows[i]["产品名称"].ToString().Split('(')[0];
+                            string product = dt.Rows[i]["产品名称"].ToString();
+                            string Logistical = dt.Rows[i]["物流公司"].ToString();
+                            dt.Rows[i]["产品名称"] = product.Split('(')[0];
+                            dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
                         }
                         ExcelExport(dt);
                         listener.Stop();
@@ -425,8 +428,8 @@ namespace XAYEXCELS
             }
 
             //sheet.ForceFormulaRecalculation = true;
-            sheet.CreateFreezePane(3, 0, 3, 0);
-                CellRangeAddress range = CellRangeAddress.ValueOf("A1:P1");
+            sheet.CreateFreezePane(3, 1, 3, 1);
+                CellRangeAddress range = CellRangeAddress.ValueOf("A1:Q1");
                 sheet.SetAutoFilter(range);
 
                 //保存
