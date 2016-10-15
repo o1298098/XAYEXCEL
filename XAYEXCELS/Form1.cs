@@ -616,9 +616,14 @@ namespace XAYEXCELS
 
         }
 
-        public void MultiSendEmail(object data)
+        public void MultiSendEmail(object emailarr)
         {
-            string emailstr = data as string;
+            string[] data = emailarr as string[];
+            for(int i = 0; i < data.Length; i++)
+            {
+            string emailstr = data[i];
+                if (emailstr == null)
+                    continue;
             string[] emaildata = emailstr.Split('☆');
             try
             {             
@@ -632,18 +637,22 @@ namespace XAYEXCELS
                 mail.Send();
                 mail = null;
                 app = null;
-                log = log + DateTime.Now.ToLongTimeString() + "  " + emaildata[4] + "的邮件发送成功\r\n";             
-               
+                log = log + DateTime.Now.ToLongTimeString() + "  " + emaildata[4] + "的邮件发送成功\r\n";
+              
+
+
 
             }
             catch (System.Exception ex)
             {
                 notifyIcon1.ShowBalloonTip(2000, "提示", emaildata[4]+ "的邮件发送失败"+","+ex.Message, ToolTipIcon.None);
                 log =log+DateTime.Now.ToLongTimeString() +"  "+ emaildata[4] + "的邮件发送失败\r\n";
-                restartemail[time1] = data as string;
+                restartemail[time1] = data[i];
                 time1++;
             }
-            
+            }
+
+
 
         }
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -651,7 +660,7 @@ namespace XAYEXCELS
             this.Visible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
-            notifyIcon1.Visible = false;
+            
         }
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
@@ -742,9 +751,9 @@ namespace XAYEXCELS
             double seconds = timeSpan.TotalSeconds;
             log = log + DateTime.Now.ToLongTimeString() + "  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
             DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");
+            string[] emailarr = new string[dailidt.Rows.Count];
             for (int k = 0; k < dailidt.Rows.Count; k++)
             {
-                Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
                 string daili = dailidt.Rows[k][0].ToString();
                 string email = dailidt.Rows[k][1].ToString();
                 string email2 = dailidt.Rows[k][2].ToString();
@@ -775,15 +784,16 @@ namespace XAYEXCELS
                 ExportEasy(dtNew, strFileName, "2");
                 string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" + email2;
                 emailarg[emailtime] = data;
+                emailarr[k] = data;
                 emailtime++;
-                if (autoemail == "True")
-                {
-                    t1.IsBackground = true;
-                    t1.Start(data);
-                }
-
             }
-            
+            if (autoemail == "True")
+            {
+                Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
+                t1.IsBackground = true;
+                t1.Start(emailarr);
+                //MultiSendEmail(data);
+            }
             //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
         }
         private void ExcelExportSH(DataTable dt)
