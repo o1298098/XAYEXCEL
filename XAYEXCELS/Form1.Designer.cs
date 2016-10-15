@@ -33,6 +33,7 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.runtsm = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendrtn = new System.Windows.Forms.ToolStripMenuItem();
             this.restart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -40,6 +41,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runtsm1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendtms = new System.Windows.Forms.ToolStripMenuItem();
             this.restarttbn = new System.Windows.Forms.ToolStripMenuItem();
             this.closetsm = new System.Windows.Forms.ToolStripMenuItem();
             this.option = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,8 +49,7 @@
             this.btnrun = new System.Windows.Forms.Button();
             this.sendbtn = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.sendrtn = new System.Windows.Forms.ToolStripMenuItem();
-            this.sendtms = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -60,7 +61,6 @@
             this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "CANDA";
-            this.notifyIcon1.Visible = true;
             this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
             // contextMenuStrip1
@@ -80,6 +80,12 @@
             this.runtsm.Size = new System.Drawing.Size(124, 22);
             this.runtsm.Text = "运行";
             this.runtsm.Click += new System.EventHandler(this.runtsm_Click);
+            // 
+            // sendrtn
+            // 
+            this.sendrtn.Name = "sendrtn";
+            this.sendrtn.Size = new System.Drawing.Size(124, 22);
+            this.sendrtn.Text = "发送邮件";
             // 
             // restart
             // 
@@ -144,21 +150,28 @@
             // runtsm1
             // 
             this.runtsm1.Name = "runtsm1";
-            this.runtsm1.Size = new System.Drawing.Size(152, 22);
+            this.runtsm1.Size = new System.Drawing.Size(124, 22);
             this.runtsm1.Text = "拆分订单";
             this.runtsm1.Click += new System.EventHandler(this.runtsm_Click);
+            // 
+            // sendtms
+            // 
+            this.sendtms.Name = "sendtms";
+            this.sendtms.Size = new System.Drawing.Size(124, 22);
+            this.sendtms.Text = "发送邮件";
+            this.sendtms.Click += new System.EventHandler(this.sendbtn_Click);
             // 
             // restarttbn
             // 
             this.restarttbn.Name = "restarttbn";
-            this.restarttbn.Size = new System.Drawing.Size(152, 22);
+            this.restarttbn.Size = new System.Drawing.Size(124, 22);
             this.restarttbn.Text = "重发邮件";
             this.restarttbn.Click += new System.EventHandler(this.restart_Click);
             // 
             // closetsm
             // 
             this.closetsm.Name = "closetsm";
-            this.closetsm.Size = new System.Drawing.Size(152, 22);
+            this.closetsm.Size = new System.Drawing.Size(124, 22);
             this.closetsm.Text = "退出";
             this.closetsm.Click += new System.EventHandler(this.closetsm_Click);
             // 
@@ -205,18 +218,11 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.restart_Click);
             // 
-            // sendrtn
+            // timer1
             // 
-            this.sendrtn.Name = "sendrtn";
-            this.sendrtn.Size = new System.Drawing.Size(124, 22);
-            this.sendrtn.Text = "发送邮件";
-            // 
-            // sendtms
-            // 
-            this.sendtms.Name = "sendtms";
-            this.sendtms.Size = new System.Drawing.Size(152, 22);
-            this.sendtms.Text = "发送邮件";
-            this.sendtms.Click += new System.EventHandler(this.sendbtn_Click);
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1
             // 
@@ -235,6 +241,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "拆分代发";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.contextMenuStrip1.ResumeLayout(false);
@@ -268,6 +275,7 @@
         private System.Windows.Forms.Button btnrun;
         private System.Windows.Forms.Button sendbtn;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

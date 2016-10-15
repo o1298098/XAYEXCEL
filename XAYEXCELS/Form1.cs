@@ -22,6 +22,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using NPOI.HPSF;
 using System.Globalization;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 
 namespace XAYEXCELS
 {
@@ -35,7 +36,7 @@ namespace XAYEXCELS
         int emailtime;
        public Form1(String[] args)
         {
-
+           
             if (args.Length > 0)
             {
                 //获取启动时的命令行参数  
@@ -70,9 +71,19 @@ namespace XAYEXCELS
                         streamToClient.Close();
                         MemoryStream ms = new MemoryStream(bytes);
                         DataTable dt = bf.Deserialize(ms) as DataTable;
+                        for (int i=0;i<dt.Rows.Count;i++)
+                        {
+                            string str = dt.Rows[i].ItemArray[13].ToString();
+                            string str2;
+                            str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
+                            str = str.Replace(str2, "");
+                            str2 = str2.Replace(" ", "");
+                            dt.Rows[i]["地址"] = str2 + str;
+                            dt.Rows[i]["产品名称"] = dt.Rows[i]["产品名称"].ToString().Split('(')[0];
+                        }
                         ExcelExport(dt);
                         listener.Stop();
-                        Thread.Sleep(3000);
+                        Thread.Sleep(1000);
 
                     }
                    
@@ -81,7 +92,7 @@ namespace XAYEXCELS
             }
             catch(System.Exception ex)
             {
-                notifyIcon1.ShowBalloonTip(2000, "提示", ex.Message, ToolTipIcon.None);
+                notifyIcon1.ShowBalloonTip(2000, "提示", ex.Message, ToolTipIcon.Error);
             }
         }
 
@@ -637,6 +648,7 @@ namespace XAYEXCELS
             this.Visible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
+            notifyIcon1.Visible = false;
         }
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
@@ -650,7 +662,8 @@ namespace XAYEXCELS
      
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
-            this.Close();
+           this.Close();
+            notifyIcon1.Visible = false;
         }     
         private void closetsm_Click(object sender, EventArgs e)
         {
@@ -719,6 +732,7 @@ namespace XAYEXCELS
             dt = dt.DefaultView.ToTable();
             string strFileName = totaldir + "\\汇总表" + DateTime.Now.ToString("yyMMdd") + ".xls";
             string autoemail = option.Rows[2].ItemArray[0].ToString();
+            
             ExportEasy(dt, strFileName, "1");
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
@@ -897,6 +911,23 @@ namespace XAYEXCELS
                 t.IsBackground = true;
                 t.Start(emailarg[i]);
             }
+        }
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //注意判断关闭事件Reason来源于窗体按钮，否则用菜单退出时无法退出!
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;    //取消"关闭窗口"事件
+                this.WindowState = FormWindowState.Minimized;    //使关闭时窗口向右下角缩小的效果
+                notifyIcon1.Visible = true;
+                this.Hide();
+                return;
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            textBox1.Text = log;
         }
     }
    

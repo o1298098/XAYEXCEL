@@ -44,7 +44,6 @@ namespace XAYBILLEXPORT
                 tcp.SendBufferSize = tableBT.Count();
                 tcp.Connect(AddressIP, 1298);//根据服务器的IP地址和侦听的端口连接
                 NetworkStream streamToServer = tcp.GetStream();
-
                 if (tcp.Connected)
                 {
                    
