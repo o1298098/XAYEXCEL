@@ -906,24 +906,18 @@ namespace XAYEXCELS
             
             int time2 = time1;
             time1 = 0;
-            for (int i = 0; i < time2; i++)
-            {
-                Thread t2 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
-                t2.IsBackground = true;
-                t2.Start(restartemail[i]);
-            }
+            Thread t2 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
+            t2.IsBackground = true;
+            t2.Start(restartemail);
           
         }
 
         private void sendbtn_Click(object sender, EventArgs e)
         {
-            int time = emailtime;           
-            for (int i = 0; i < time; i++)
-            {
+            int time = emailtime;  
                 Thread t = new Thread(new ParameterizedThreadStart(MultiSendEmail));
                 t.IsBackground = true;
-                t.Start(emailarg[i]);
-            }
+                t.Start(emailarg);
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
