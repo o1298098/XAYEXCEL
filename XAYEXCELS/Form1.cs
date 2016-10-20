@@ -81,7 +81,7 @@ namespace XAYEXCELS
                             dt.Rows[i]["地址"] = str2 + str;
                             string product = dt.Rows[i]["产品名称"].ToString();
                             string Logistical = dt.Rows[i]["物流公司"].ToString();
-                            dt.Rows[i]["产品名称"] = product.Split('(')[0];
+                            dt.Rows[i]["产品名称"] = product.Split('（')[0];
                             dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
                         }
                         ExcelExport(dt);
