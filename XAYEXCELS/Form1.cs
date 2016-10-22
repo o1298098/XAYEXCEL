@@ -2,27 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Xml;
-using System.Net.Mail;
-using System.Collections;
 using System.Net;
 using System.Threading;
 using NPOI.SS.Util;
-using System.IO.Pipes;
 using System.Runtime.Serialization.Formatters.Binary;
 using NPOI.HPSF;
 using System.Globalization;
 using System.Net.Sockets;
-using System.Text.RegularExpressions;
+using Kingdee.BOS.WebApi.Client;
+using Newtonsoft.Json.Linq;
 
 namespace XAYEXCELS
 {
@@ -935,6 +929,331 @@ namespace XAYEXCELS
         private void timer1_Tick(object sender, EventArgs e)
         {
             textBox1.Text = log;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            string filename = openFileDialog1.FileName;
+            string exportname = filename.Replace(openFileDialog1.SafeFileName,"") + "生成.xls";
+            DataTable dt= ImportExcelFilesingle(filename);
+            dt.Columns[3].ColumnName = "产品编码";
+            dt.Columns[4].ColumnName = "拿货单价";
+            dt.Columns[5].ColumnName = "结算费用";
+            dt.Columns[6].ColumnName = "物流公司";
+            dt.Columns[9].ColumnName = "业务员";
+            dt.Columns[14].ColumnName = "姓名";
+            dt.Columns[15].ColumnName = "手机";
+            dt.Columns[17].ColumnName = "注释";
+            ExportEasyFY(dt, exportname, "1");
+        }
+        public System.Data.DataTable ImportExcelFilesingle(string filePath)
+        {
+
+           
+            DataTable drtable = new System.Data.DataTable();
+         
+                try
+                {
+                  
+                    using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        //file.Position = 0;
+                        if (filePath.EndsWith(".xls"))
+                        {
+                            workbook = new HSSFWorkbook(file);
+                        }
+                        else /*if (filePath.EndsWith(".xlsx"))*/
+                        {
+                            workbook = new XSSFWorkbook(file);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                ISheet sheet = workbook.GetSheetAt(0);
+                IRow headerRow;
+                int cellCount;
+                int rowCount;
+               
+                    headerRow = sheet.GetRow(0);
+                    cellCount = 18;
+                    rowCount = sheet.LastRowNum;
+               
+                    for (int i = headerRow.FirstCellNum; i < cellCount; i++)
+                    {
+                        bool samecol = drtable.Columns.Contains(headerRow.GetCell(i).ToString());
+                        if (!samecol)
+                        {
+                            DataColumn column = new DataColumn(headerRow.GetCell(i).StringCellValue);
+                            if (column.ColumnName == null) { column.ColumnName = ""; }
+                            drtable.Columns.Add(column);
+                          
+                    }
+
+                }
+            try
+            {
+
+                for (int i = (sheet.FirstRowNum + 1); i <= rowCount; i++)
+                {
+                    IRow row = sheet.GetRow(i);
+                    DataRow dataRow = drtable.NewRow();
+                    if (row != null)
+                    {
+                        for (int j = row.FirstCellNum; j < cellCount; j++)
+                        {
+                            if (row.GetCell(j) != null)
+                            {
+                                //if (j == 0 && row.GetCell(j).ToString() != "")
+                                //{
+                                //    dataRow[j] = row.GetCell(j).DateCellValue.ToShortDateString();
+                                //}
+                                //else 
+                                if ((j == 1 || j == 22 || j == 26) && row.GetCell(j).ToString() != "" && row.GetCell(j).ToString() != "购买日期" && row.GetCell(j).CellType != CellType.String)
+                                {
+                                    dataRow[j] = row.GetCell(j).DateCellValue.ToShortDateString();
+
+                                }
+                                else if (row.GetCell(j).CellType == CellType.Numeric)
+                                {
+                                    dataRow[j] = row.GetCell(j).NumericCellValue;
+                                }
+                                else if (row.GetCell(j).CellType == CellType.String)
+                                {
+                                    dataRow[j] = row.GetCell(j).StringCellValue.Trim();
+                                }
+                                else if (row.GetCell(j).CellType == CellType.Formula && (j == 5 || j == 16))
+                                {
+                                    dataRow[j] = row.GetCell(j).NumericCellValue;
+                                }
+                                else
+                                {
+                                    dataRow[j] = row.GetCell(j);
+                                }
+
+                            }
+
+                        }
+                    }
+
+                    drtable.Rows.Add(dataRow);
+                }
+        }
+                catch (Exception ex)
+                {
+                    notifyIcon1.ShowBalloonTip(2000, "提示", "运行失败，excel文件单元格格式有误", ToolTipIcon.Error);
+                    log = log  +DateTime.Now.ToLongTimeString() + "  运行失败，excel文件单元格格式有误\r\n";
+                    
+                }
+
+
+
+            return drtable;
+        }
+        public void ExportEasyFY(DataTable dtSource, string strFileName, string exceltype)
+        {
+            HSSFWorkbook workbook1 = new HSSFWorkbook();
+            ISheet sheet = workbook1.CreateSheet("订单总表");
+            IRow dataRow = sheet.CreateRow(0);
+            ICellStyle style = workbook1.CreateCellStyle();
+            ICellStyle style2 = workbook1.CreateCellStyle();
+            ICellStyle styleh = workbook1.CreateCellStyle();
+            IFont font = workbook1.CreateFont();
+            dataRow.Height = 28 * 20;
+            //sheet.DefaultColumnWidth = 10 * 256;
+            sheet.SetColumnWidth(0, 10 * 256);
+            sheet.SetColumnWidth(1, 11 * 256);
+            sheet.SetColumnWidth(2, 9 * 256);
+            if (exceltype == "2")
+            {
+                sheet.SetColumnWidth(11, 20 * 256);
+            }
+            sheet.SetColumnWidth(13, 13 * 256);
+            sheet.SetColumnWidth(14, 15 * 256);
+            sheet.SetColumnWidth(15, 13 * 256);
+            sheet.SetColumnWidth(16, 15 * 256);
+            style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+            style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+            style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+            style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+            font.FontName = "宋体";
+            font.FontHeightInPoints = 10;
+            style.SetFont(font);
+            style2.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+            style2.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            style2.VerticalAlignment = VerticalAlignment.Center;
+            style2.SetFont(font);
+            styleh.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            styleh.VerticalAlignment = VerticalAlignment.Center;
+            styleh.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.CornflowerBlue.Index;
+            styleh.FillPattern = FillPattern.SolidForeground;
+            styleh.FillBackgroundColor = NPOI.HSSF.Util.HSSFColor.CornflowerBlue.Index;
+            styleh.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+            styleh.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+            //font.IsBold =true;
+            styleh.SetFont(font);
+            foreach (DataColumn column in dtSource.Columns)
+            {
+                dataRow.CreateCell(column.Ordinal).SetCellValue(column.ColumnName);
+                dataRow.Cells[column.Ordinal].CellStyle = styleh;
+            }
+
+            try
+            {
+                //填充内容
+                for (int i = 0; i < dtSource.Rows.Count; i++)
+                {
+                    dataRow = sheet.CreateRow(i + 1);
+                    for (int j = 0; j < dtSource.Columns.Count; j++)
+                    {
+                        string dtcellvalue = dtSource.Rows[i][j].ToString();
+                        if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8) && dtcellvalue != "")
+                        {
+
+                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.Cells[j].CellStyle = style2;
+
+
+
+                        }
+                        else if (exceltype == "2" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
+                        {
+
+                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.Cells[j].CellStyle = style2;
+
+                        }
+                        else if (exceltype == "3" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
+                        {
+
+                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.Cells[j].CellStyle = style2;
+
+                        }
+                        else
+                        {
+                            dataRow.CreateCell(j).SetCellValue(dtcellvalue);
+                            dataRow.Cells[j].CellStyle = style;
+
+                        }
+                        //
+
+
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                log = log + DateTime.Now.ToLongTimeString() + "  金额单元格格式有误\r\n";
+                notifyIcon1.ShowBalloonTip(2000, "提示", "金额单元格格式有误", ToolTipIcon.Error);
+                throw ex;
+            }
+
+            //sheet.ForceFormulaRecalculation = true;
+            sheet.CreateFreezePane(3, 1, 3, 1);
+            CellRangeAddress range = CellRangeAddress.ValueOf("A1:Q1");
+            sheet.SetAutoFilter(range);
+            //生成代理工作表
+            string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+            DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");
+            string[] emailarr = new string[dailidt.Rows.Count];
+            for (int k = 0; k < dailidt.Rows.Count; k++)
+            {
+                string daili = dailidt.Rows[k][0].ToString();
+                string email = dailidt.Rows[k][1].ToString();
+                string email2 = dailidt.Rows[k][2].ToString();
+                string emailSubject = dailidt.Rows[k][3].ToString();
+                string emailBody = dailidt.Rows[k][4].ToString();
+                string daili2 = dailidt.Rows[k][5].ToString();
+                DataRow[] drArr;
+                drArr = dtSource.Select("业务员 LIKE '" + daili.Substring(0, 1) + "%'");
+                DataTable dtNew = dtSource.Clone();
+                dtNew.Columns.Remove("产品编码");
+                dtNew.Columns.Remove("拿货单价");
+                dtNew.Columns.Remove("省");
+                dtNew.Columns.Remove("市");
+                dtNew.Columns.Remove("区");
+                dtNew.Columns.Remove("姓名");
+                dtNew.Columns.Remove("手机");
+                dtNew.Columns.Remove("注释");
+                if (drArr.Length == 0)
+                    continue;
+                for (int i = 0; i < drArr.Length; i++)
+                {
+                    dtNew.ImportRow(drArr[i]);
+                }
+                sheet = workbook1.CreateSheet(daili);
+                dataRow = sheet.CreateRow(0);
+                dataRow.Height = 28 * 20;
+                //sheet.DefaultColumnWidth = 10 * 256;
+                sheet.SetColumnWidth(0, 12 * 256);
+                sheet.SetColumnWidth(1, 12 * 256);
+                sheet.SetColumnWidth(2, 8 * 256);
+                sheet.SetColumnWidth(8, 16 * 256);
+                sheet.SetColumnWidth(9, 15 * 256);
+                
+                foreach (DataColumn column in dtNew.Columns)
+                {
+                    dataRow.CreateCell(column.Ordinal).SetCellValue(column.ColumnName);
+                    dataRow.Cells[column.Ordinal].CellStyle = styleh;
+                }
+
+                try
+                {
+                    //填充内容
+                    for (int i = 0; i < dtNew.Rows.Count; i++)
+                    {
+                        dataRow = sheet.CreateRow(i + 1);
+                        for (int j = 0; j < dtNew.Columns.Count; j++)
+                        {
+                            string dtcellvalue = dtNew.Rows[i][j].ToString();
+                            if ((j == 2 || j == 3 || j == 5||j==6) && dtcellvalue != "")
+                            {
+
+                                dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                                dataRow.Cells[j].CellStyle = style2;
+
+                            }
+                            else
+                            {
+                                dataRow.CreateCell(j).SetCellValue(dtcellvalue);
+                                dataRow.Cells[j].CellStyle = style;
+
+                            }
+                            //
+
+
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    log = log + DateTime.Now.ToLongTimeString() + "  金额单元格格式有误\r\n";
+                    notifyIcon1.ShowBalloonTip(2000, "提示", "金额单元格格式有误", ToolTipIcon.Error);
+                    throw ex;
+                }
+
+                //sheet.ForceFormulaRecalculation = true;
+            }
+            //保存
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (FileStream fs = new FileStream(strFileName, FileMode.Create, FileAccess.Write))
+                {
+                    workbook1.Write(fs);
+                }
+            }
+
         }
     }
    

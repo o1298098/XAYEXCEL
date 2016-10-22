@@ -39,14 +39,19 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbshouhou = new System.Windows.Forms.RadioButton();
+            this.rbyewu = new System.Windows.Forms.RadioButton();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button4 = new System.Windows.Forms.Button();
-            this.rbyewu = new System.Windows.Forms.RadioButton();
-            this.rbshouhou = new System.Windows.Forms.RadioButton();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -62,7 +67,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(434, 513);
+            this.button1.Location = new System.Drawing.Point(436, 532);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
@@ -130,7 +135,7 @@
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.TBY);
             this.groupBox1.Controls.Add(this.TYO);
-            this.groupBox1.Location = new System.Drawing.Point(12, 28);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(340, 92);
             this.groupBox1.TabIndex = 8;
@@ -144,12 +149,33 @@
             this.groupBox2.Controls.Add(this.checkBox2);
             this.groupBox2.Controls.Add(this.checkBox1);
             this.groupBox2.Controls.Add(this.dataGridView1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 135);
+            this.groupBox2.Location = new System.Drawing.Point(6, 122);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(599, 352);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "代理设置";
+            // 
+            // rbshouhou
+            // 
+            this.rbshouhou.AutoSize = true;
+            this.rbshouhou.Location = new System.Drawing.Point(326, 329);
+            this.rbshouhou.Name = "rbshouhou";
+            this.rbshouhou.Size = new System.Drawing.Size(47, 16);
+            this.rbshouhou.TabIndex = 13;
+            this.rbshouhou.TabStop = true;
+            this.rbshouhou.Text = "售后";
+            this.rbshouhou.UseVisualStyleBackColor = true;
+            // 
+            // rbyewu
+            // 
+            this.rbyewu.AutoSize = true;
+            this.rbyewu.Location = new System.Drawing.Point(252, 329);
+            this.rbyewu.Name = "rbyewu";
+            this.rbyewu.Size = new System.Drawing.Size(59, 16);
+            this.rbyewu.TabIndex = 12;
+            this.rbyewu.Text = "业务部";
+            this.rbyewu.UseVisualStyleBackColor = true;
             // 
             // checkBox2
             // 
@@ -174,7 +200,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(526, 513);
+            this.button4.Location = new System.Drawing.Point(548, 532);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 10;
@@ -182,36 +208,46 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // rbyewu
+            // tabControl1
             // 
-            this.rbyewu.AutoSize = true;
-            this.rbyewu.Location = new System.Drawing.Point(252, 329);
-            this.rbyewu.Name = "rbyewu";
-            this.rbyewu.Size = new System.Drawing.Size(59, 16);
-            this.rbyewu.TabIndex = 12;
-            this.rbyewu.Text = "业务部";
-            this.rbyewu.UseVisualStyleBackColor = true;
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(2, 12);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(645, 506);
+            this.tabControl1.TabIndex = 11;
             // 
-            // rbshouhou
+            // tabPage1
             // 
-            this.rbshouhou.AutoSize = true;
-            this.rbshouhou.Location = new System.Drawing.Point(326, 329);
-            this.rbshouhou.Name = "rbshouhou";
-            this.rbshouhou.Size = new System.Drawing.Size(47, 16);
-            this.rbshouhou.TabIndex = 13;
-            this.rbshouhou.TabStop = true;
-            this.rbshouhou.Text = "售后";
-            this.rbshouhou.UseVisualStyleBackColor = true;
+            this.tabPage1.Controls.Add(this.groupBox1);
+            this.tabPage1.Controls.Add(this.groupBox2);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(637, 480);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "常规";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(637, 480);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "方案";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(623, 548);
+            this.ClientSize = new System.Drawing.Size(659, 567);
             this.ControlBox = false;
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.button4);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Name = "Form2";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -222,6 +258,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -244,5 +282,8 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.RadioButton rbshouhou;
         private System.Windows.Forms.RadioButton rbyewu;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
     }
 }
