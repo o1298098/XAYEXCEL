@@ -58,10 +58,10 @@ namespace XAYEXCELS
                 while (true)
                 {
 
-                    TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 1298));
+                    TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Parse("10.0.0.5"), 1298));
                     listener.Start();
                     TcpClient remoteClient = listener.AcceptTcpClient();
-
+              
                     NetworkStream streamToClient = remoteClient.GetStream();
                     lock (streamToClient)
                     {
