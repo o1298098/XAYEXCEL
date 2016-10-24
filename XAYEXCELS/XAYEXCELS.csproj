@@ -125,8 +125,12 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="UDPCOMMON">
+      <HintPath>C:\Users\admin\Source\Repos\UDPNAT\UDPCOMMON\bin\Debug\UDPCOMMON.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

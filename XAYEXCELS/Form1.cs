@@ -17,6 +17,9 @@ using System.Globalization;
 using System.Net.Sockets;
 using Kingdee.BOS.WebApi.Client;
 using Newtonsoft.Json.Linq;
+using UDPNATCLIENT;
+using UDPCOMMON;
+using NPOI.POIFS.NIO;
 
 namespace XAYEXCELS
 {
@@ -28,7 +31,9 @@ namespace XAYEXCELS
         string[] emailarg = new string[1000];
         int time1;
         int emailtime;
-       public Form1(String[] args)
+        private Client _client;
+      
+        public Form1(String[] args)
         {
            
             if (args.Length > 0)
@@ -51,7 +56,9 @@ namespace XAYEXCELS
             {
                 while (true)
                 {
-
+                    _client = new Client { OnWriteMessage = WriteLog};
+                    _client.Login("test", "");
+                    _client.Start();
                     TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 1298));
                     listener.Start();
                     TcpClient remoteClient = listener.AcceptTcpClient();
@@ -94,7 +101,11 @@ namespace XAYEXCELS
         }
 
         IWorkbook workbook;
-
+        private void WriteLog(string msg)
+        {
+            log = log + msg+ "\r\n";
+        }
+       
         public static byte[] Read2Buffer(Stream stream, int BufferLen)
         {
             // 如果指定的无效长度的缓冲区，则指定一个默认的长度作为缓存大小
@@ -205,8 +216,8 @@ namespace XAYEXCELS
                     }
                     
                 }
-                //try
-                //{
+                try
+                {
 
                     for (int i = (sheet.FirstRowNum + 1); i <= rowCount; i++)
                 {
@@ -251,15 +262,15 @@ namespace XAYEXCELS
                    
                     drtable.Rows.Add(dataRow);
                 }
-                //}
-                //catch (Exception ex)
-                //{
-                //    notifyIcon1.ShowBalloonTip(2000, "提示", "运行失败，excel文件单元格格式有误", ToolTipIcon.Error);
-                //    log = log  +DateTime.Now.ToLongTimeString() + "  运行失败，excel文件单元格格式有误\r\n";
-                //    break;
-                //}
-
             }
+                catch (Exception ex)
+            {
+                notifyIcon1.ShowBalloonTip(2000, "提示", "运行失败，excel文件单元格格式有误", ToolTipIcon.Error);
+                log = log + DateTime.Now.ToLongTimeString() + "  运行失败，excel文件单元格格式有误\r\n";
+                break;
+            }
+
+        }
 
             return drtable;
         }
@@ -668,7 +679,9 @@ namespace XAYEXCELS
      
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
-           this.Close();
+            if (_client != null)
+                _client.Logout();
+            this.Close();
             notifyIcon1.Visible = false;
         }     
         private void closetsm_Click(object sender, EventArgs e)
