@@ -71,7 +71,7 @@ namespace XAYEXCELS
                         streamToClient.Close();
                         MemoryStream ms = new MemoryStream(bytes);
                         DataTable dt = bf.Deserialize(ms) as DataTable;
-                        for (int i=0;i<dt.Rows.Count;i++)
+                        for (int i = 0; i < dt.Rows.Count; i++)
                         {
                             string str = dt.Rows[i].ItemArray[13].ToString();
                             string str2;
@@ -89,7 +89,7 @@ namespace XAYEXCELS
                         Thread.Sleep(1000);
 
                     }
-                   
+
                 }
                
             }
