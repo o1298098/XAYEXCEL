@@ -140,6 +140,7 @@ namespace XAYEXCELS
             dt2.Rows.Add(checkBox2.Checked);
             dt2.Rows.Add(rbyewu.Checked);
             dt2.Rows.Add(rbshouhou.Checked);
+            dt2.Rows.Add(textBox1.Text);
             WriteToXml(dt2, sysstr + "\\Option.xml");
             this.Close();
         }
@@ -150,6 +151,7 @@ namespace XAYEXCELS
             DataTable dt = ReadFromXml(sysstr + "\\Option.xml");
             TBY.Text = dt.Rows[0].ItemArray[0].ToString();
             TYO.Text = dt.Rows[1].ItemArray[0].ToString();
+            textBox1.Text = dt.Rows[6].ItemArray[0].ToString();
             if (dt.Rows[2].ItemArray[0].ToString() == "True")
             {
                 checkBox1.Checked = true;

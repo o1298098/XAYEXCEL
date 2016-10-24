@@ -32,7 +32,9 @@ namespace XAYEXCELS
         int time1;
         int emailtime;
         private Client _client;
-      
+        UserCollection Users;
+
+
         public Form1(String[] args)
         {
            
@@ -54,11 +56,18 @@ namespace XAYEXCELS
         {
             try
             {
-                while (true)
-                {
-                    _client = new Client { OnWriteMessage = WriteLog};
-                    _client.Login("test", "");
+                string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+                DataTable option = ReadFromXml(sysstr + "\\Option.xml");
+                string loginuser = option.Rows[6].ItemArray[0].ToString();
+                _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
+                    _client.Login(loginuser, "");
                     _client.Start();
+                    //Thread.Sleep(3000);
+                    //if (_client != null)
+                    //{
+                    //    _client.DownloadUserList();
+                    //    _client.HolePunching(Users[0] as User);
+                    //}
                     TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 1298));
                     listener.Start();
                     TcpClient remoteClient = listener.AcceptTcpClient();
@@ -87,9 +96,8 @@ namespace XAYEXCELS
                         }
                         ExcelExport(dt);
                         listener.Stop();
-                        Thread.Sleep(1000);
 
-                    }
+                   
                    
                 }
                
@@ -101,6 +109,10 @@ namespace XAYEXCELS
         }
 
         IWorkbook workbook;
+        private void OnUserChanged(UserCollection user)
+        {
+            Users = user;
+        }
         private void WriteLog(string msg)
         {
             log = log + msg+ "\r\n";

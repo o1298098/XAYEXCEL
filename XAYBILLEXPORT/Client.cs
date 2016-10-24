@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows.Forms;
 using System.IO;
 using UDPCOMMON;
 using ThreadState = System.Threading.ThreadState;
@@ -122,11 +123,11 @@ namespace UDPNATCLIENT
         /// 显示在线用户 
         /// </summary> 
         /// <param name="users"></param> 
-        //private void DisplayUsers(UserCollection users)
-        //{
-        //    if (_UserChangedHandle != null)
-        //        ((System.Web.UI.Control) _UserChangedHandle.Target).Invoke(_UserChangedHandle, users);
-        //}
+        private void DisplayUsers(UserCollection users)
+        {
+            if (_UserChangedHandle != null)
+                ((Control)_UserChangedHandle.Target).Invoke(_UserChangedHandle, users);
+        }
 
         //运行线程 
         private void Run()
@@ -151,7 +152,7 @@ namespace UDPNATCLIENT
                         foreach (User user in usersMsg.UserList)
                             _userList.Add(user);
 
-                        //DisplayUsers(_userList);
+                        DisplayUsers(_userList);
                     }
                     else if (msgType == typeof(S2C_UserAction))
                     {
@@ -160,13 +161,13 @@ namespace UDPNATCLIENT
                         if (msgAction.Action == UserAction.Login)
                         {
                             _userList.Add(msgAction.User);
-                            //DisplayUsers(_userList);
+                            DisplayUsers(_userList);
                         }
                         else if (msgAction.Action == UserAction.Logout)
                         {
                             User user = _userList.Find(msgAction.User.UserName);
                             if (user != null) _userList.Remove(user);
-                            //DisplayUsers(_userList);
+                            DisplayUsers(_userList);
                         }
                     }
                     else if (msgType == typeof(S2C_HolePunchingMessage))
@@ -223,7 +224,7 @@ namespace UDPNATCLIENT
                 remoteUser.IsConnected = true;
                 //DoWriteLog(string.Format("您已经与{0}建立通信通道,IP:{1}!",
                 //remoteUser.UserName, remoteUser.NetPoint));
-                //DisplayUsers(_userList);
+                DisplayUsers(_userList);
             }
         }
 
