@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.IO;
 using UDPCOMMON;
 using ThreadState = System.Threading.ThreadState;
-
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace UDPNATCLIENT
 {
@@ -254,8 +254,25 @@ namespace UDPNATCLIENT
         {
             if (msg == null) return;
             //DoWriteLog("正在发送消息给->" + remoteIP + ",内容:" + msg);
-            byte[] buffer = ObjectSerializer.Serialize(msg);
-            _client.Send(buffer, buffer.Length, remoteIP);
+            var binaryF = new BinaryFormatter();
+            var ms = new MemoryStream();
+            binaryF.Serialize(ms, msg);
+            ms.Seek(0, SeekOrigin.Begin);
+            byte[] buffer = new byte[4096];
+            while (ms.Read(buffer, 0, 4096) > 0)
+            {
+                try
+                {
+                    _client.Send(buffer, buffer.Length, remoteIP);
+                    break;
+                }
+                catch(Exception ex)
+                {
+
+                }
+            }
+           
+            ms.Close();
             //DoWriteLog("消息已发送.");
         }
 

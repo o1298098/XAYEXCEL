@@ -33,7 +33,7 @@ namespace XAYEXCELS
         int emailtime;
         public Client _client;
         public UserCollection Users;
-        public byte[] p2pbyte;
+        static byte[] p2pbyte;
 
 
         public Form1(String[] args)
@@ -45,18 +45,6 @@ namespace XAYEXCELS
                 arg = args[0];
             }
             InitializeComponent();
-            string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-            DataTable option = ReadFromXml(sysstr + "\\Option.xml");
-            string loginuser = option.Rows[6].ItemArray[0].ToString();
-            _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
-            _client.Login(loginuser, "");
-            _client.Start();
-            //Thread.Sleep(1000);
-            //if (_client != null)
-            //{
-            //    _client.DownloadUserList();
-            //    _client.HolePunching(Users[0] as User);
-            //}
             Thread pipethread = new Thread(new ThreadStart(receiveStream));
             pipethread.IsBackground = true;
             pipethread.Start();
@@ -69,6 +57,18 @@ namespace XAYEXCELS
         {
             try
             {
+                string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+                DataTable option = ReadFromXml(sysstr + "\\Option.xml");
+                string loginuser = option.Rows[6].ItemArray[0].ToString();
+                _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
+                _client.Login(loginuser, "");
+                _client.Start();
+                //Thread.Sleep(1000);
+                //if (_client != null)
+                //{
+                //    _client.DownloadUserList();
+                //    _client.HolePunching(Users[0] as User);
+                //}
                 while (true)
                 {
                     if (p2pbyte != null)
@@ -106,7 +106,7 @@ namespace XAYEXCELS
             }
         }
 
-        public void NewMethod(byte[] ms)
+        public static void NewMethod(byte[] ms)
         {
            p2pbyte= ms;
            
