@@ -6,7 +6,9 @@ using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using UDPCOMMON;
+using XAYEXCELS;
 using ThreadState = System.Threading.ThreadState;
+
 
 namespace UDPNATCLIENT
 {
@@ -23,6 +25,7 @@ namespace UDPNATCLIENT
         private readonly UserCollection _userList;//在线用户列表 
         private readonly Thread _listenThread; //监听线程 
         private string _LocalUserName; //本地用户名 
+        public object msgObj;
         //private bool _HoleAccepted = false; //A->B,接收到B用户的确认消息 
 
         private WriteLogHandle _OnWriteMessage;
@@ -137,8 +140,7 @@ namespace UDPNATCLIENT
                 while (true)
                 {
                     buffer = _client.Receive(ref _remotePoint);//_remotePoint变量返回当前连接的用户IP地址 
-
-                    object msgObj = ObjectSerializer.Deserialize(buffer);
+                    msgObj = ObjectSerializer.Deserialize(buffer);
                     Type msgType = msgObj.GetType();
                     DoWriteLog("接收到消息:" + msgType + " From:" + _remotePoint);
 
@@ -202,6 +204,8 @@ namespace UDPNATCLIENT
                     {
                         //用户间对话消息 
                         P2P_TalkMessage workMsg = (P2P_TalkMessage)msgObj;
+                        Form1.NewMethod(workMsg.Message);
+
                         //DoWriteLog(workMsg.Message);
                     }
                     else

@@ -33,6 +33,7 @@ namespace XAYEXCELS
         int emailtime;
         public Client _client;
         public UserCollection Users;
+        public byte[] p2pbyte;
 
 
         public Form1(String[] args)
@@ -44,6 +45,18 @@ namespace XAYEXCELS
                 arg = args[0];
             }
             InitializeComponent();
+            string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+            DataTable option = ReadFromXml(sysstr + "\\Option.xml");
+            string loginuser = option.Rows[6].ItemArray[0].ToString();
+            _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
+            _client.Login(loginuser, "");
+            _client.Start();
+            //Thread.Sleep(1000);
+            //if (_client != null)
+            //{
+            //    _client.DownloadUserList();
+            //    _client.HolePunching(Users[0] as User);
+            //}
             Thread pipethread = new Thread(new ThreadStart(receiveStream));
             pipethread.IsBackground = true;
             pipethread.Start();
@@ -56,32 +69,14 @@ namespace XAYEXCELS
         {
             try
             {
-                string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-                DataTable option = ReadFromXml(sysstr + "\\Option.xml");
-                string loginuser = option.Rows[6].ItemArray[0].ToString();
-                _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
-                    _client.Login(loginuser, "");
-                    _client.Start();
-                Thread.Sleep(1000);
-                if (_client != null)
+                while (true)
                 {
-                    _client.DownloadUserList();
-                    _client.HolePunching(Users[0] as User);
-                }
-                TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 1298));
-                    listener.Start();
-                    TcpClient remoteClient = listener.AcceptTcpClient();
-
-                    NetworkStream streamToClient = remoteClient.GetStream();
-                    lock (streamToClient)
+                    if (p2pbyte != null)
                     {
-                        byte[] bytes = Read2Buffer(streamToClient, 1024 * 1000);
                         BinaryFormatter bf = new BinaryFormatter();
-                        streamToClient.Read(bytes, 0, bytes.Length);
-                        streamToClient.Close();
-                        MemoryStream ms = new MemoryStream(bytes);
+                        MemoryStream ms = new MemoryStream(p2pbyte);
                         DataTable dt = bf.Deserialize(ms) as DataTable;
-                        for (int i=0;i<dt.Rows.Count;i++)
+                        for (int i = 0; i < dt.Rows.Count; i++)
                         {
                             string str = dt.Rows[i].ItemArray[13].ToString();
                             string str2;
@@ -95,17 +90,26 @@ namespace XAYEXCELS
                             dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
                         }
                         ExcelExport(dt);
-                        listener.Stop();
-
-                   
-                   
+                        p2pbyte = null;
+                    }
+                    Thread.Sleep(1000);
                 }
-               
+
+
+
+
+
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 notifyIcon1.ShowBalloonTip(2000, "提示", ex.Message, ToolTipIcon.Error);
             }
+        }
+
+        public void NewMethod(byte[] ms)
+        {
+           p2pbyte= ms;
+           
         }
 
         IWorkbook workbook;

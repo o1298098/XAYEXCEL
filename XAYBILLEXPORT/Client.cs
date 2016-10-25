@@ -203,7 +203,7 @@ namespace UDPNATCLIENT
                     {
                         //用户间对话消息 
                         P2P_TalkMessage workMsg = (P2P_TalkMessage)msgObj;
-                        _client.Send(workMsg.Message, workMsg.Message.Length, _remotePoint);
+                        //_client.Send(workMsg.Message, workMsg.Message.Length, _remotePoint);
                         //DoWriteLog(workMsg.Message);
                     }
                     else
