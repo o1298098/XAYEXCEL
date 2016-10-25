@@ -21,7 +21,7 @@ namespace UDPNATCLIENT
         private readonly UdpClient _client;//客户端监听 
         private readonly IPEndPoint _hostPoint; //主机IP 
         private IPEndPoint _remotePoint; //接收任何远程机器的数据 
-        private readonly UserCollection _userList;//在线用户列表 
+        public readonly UserCollection _userList;//在线用户列表 
         private readonly Thread _listenThread; //监听线程 
         private string _LocalUserName; //本地用户名 
         //private bool _HoleAccepted = false; //A->B,接收到B用户的确认消息 

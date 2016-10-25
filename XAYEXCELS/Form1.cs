@@ -31,8 +31,8 @@ namespace XAYEXCELS
         string[] emailarg = new string[1000];
         int time1;
         int emailtime;
-        private Client _client;
-        UserCollection Users;
+        public Client _client;
+        public UserCollection Users;
 
 
         public Form1(String[] args)
@@ -62,13 +62,13 @@ namespace XAYEXCELS
                 _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
                     _client.Login(loginuser, "");
                     _client.Start();
-                    //Thread.Sleep(3000);
-                    //if (_client != null)
-                    //{
-                    //    _client.DownloadUserList();
-                    //    _client.HolePunching(Users[0] as User);
-                    //}
-                    TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 1298));
+                Thread.Sleep(1000);
+                if (_client != null)
+                {
+                    _client.DownloadUserList();
+                    _client.HolePunching(Users[0] as User);
+                }
+                TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 1298));
                     listener.Start();
                     TcpClient remoteClient = listener.AcceptTcpClient();
 
