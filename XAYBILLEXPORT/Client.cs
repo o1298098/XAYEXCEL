@@ -264,7 +264,7 @@ namespace UDPNATCLIENT
                 try
                 {
                     _client.Send(buffer, buffer.Length, remoteIP);
-                    break;
+                   
                 }
                 catch(Exception ex)
                 {
