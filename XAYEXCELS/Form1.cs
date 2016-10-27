@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 using System.IO;
@@ -8,18 +7,15 @@ using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Xml;
-using System.Net;
 using System.Threading;
 using NPOI.SS.Util;
 using System.Runtime.Serialization.Formatters.Binary;
 using NPOI.HPSF;
 using System.Globalization;
-using System.Net.Sockets;
-using Kingdee.BOS.WebApi.Client;
-using Newtonsoft.Json.Linq;
-using UDPNATCLIENT;
-using UDPCOMMON;
-using NPOI.POIFS.NIO;
+using P2PCLIENT;
+using ZYSocket.share;
+using XAYEXCELS.Properties;
+using System.Text;
 
 namespace XAYEXCELS
 {
@@ -31,11 +27,9 @@ namespace XAYEXCELS
         string[] emailarg = new string[1000];
         int time1;
         int emailtime;
-        public Client _client;
-        public UserCollection Users;
-        static byte[] p2pbyte;
-
-
+        private ClientInfo MClient { get; set; }
+        MemoryStream p2pms = new MemoryStream();
+        private List<UserInfo> UserList { get; set; }
         public Form1(String[] args)
         {
            
@@ -45,130 +39,136 @@ namespace XAYEXCELS
                 arg = args[0];
             }
             InitializeComponent();
-            Thread pipethread = new Thread(new ThreadStart(receiveStream));
-            pipethread.IsBackground = true;
-            pipethread.Start();
-            
-
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (arg != null)
+            {
+                this.Visible = false;
+                this.ShowInTaskbar = false;
+            }
+            LogOut.Action += new ActionOutHandler(LogOut_Action);
+            MClient = new ClientInfo(Settings.Default.ServerIP, Settings.Default.ServerPort, Settings.Default.ServerRegPort, Settings.Default.MinPort, Settings.Default.MaxPort, Settings.Default.ResCount, Settings.Default.Mac);
+            MClient.ClientDataIn += new ClientDataInHandler(client_ClientDataIn);
+            MClient.ClientConnToMe += new ClientConnToHandler(client_ClientConnToMe);
+            MClient.ClientDiscon += new ClientDisconHandler(client_ClientDiscon);
+            MClient.ConToServer();
 
         }
-
-        private void receiveStream()
+        void client_ClientDiscon(ConClient client, string message)
         {
             try
             {
-                string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-                DataTable option = ReadFromXml(sysstr + "\\Option.xml");
-                string loginuser = option.Rows[6].ItemArray[0].ToString();
-                _client = new Client { OnWriteMessage = WriteLog, OnUserChanged = OnUserChanged };
-                _client.Login(loginuser, "");
-                _client.Start();
-                //Thread.Sleep(1000);
-                //if (_client != null)
-                //{
-                //    _client.DownloadUserList();
-                //    _client.HolePunching(Users[0] as User);
-                //}
-                while (true)
+                
+                if (!client.IsProxy)
                 {
-                    if (p2pbyte != null)
+                    client.Sock.Close();
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+         void client_ClientConnToMe(ConClient client)
+        {
+            if (UserList == null)
+                UserList = new List<UserInfo>();
+            UserInfo user = new UserInfo();
+            user.Client = client;
+            user.MainClient = MClient;
+            user.Stream = new ZYSocket.share.ZYNetRingBufferPoolV2(1073741824);
+            client.UserToken = user;
+            UserList.Add(user);
+            this.BeginInvoke(new EventHandler((a, b) =>
+            {
+                this.textBox1.AppendText(client.Host + ":" + client.Port + "-" + client.Key + " 连接");
+            }));
+        }
+
+         void client_ClientDataIn(string key, ConClient client, byte[] data)
+        {
+            //try
+            //{
+                UserInfo user = client.UserToken as UserInfo;
+
+                if (user == null && client.IsProxy)
+                {
+
+                    if (UserList == null)
+                        UserList = new List<UserInfo>();
+
+                    user = new UserInfo();
+                    user.Client = client;
+                    user.MainClient = MClient;
+                    user.Stream = new ZYSocket.share.ZYNetRingBufferPoolV2(1073741824);
+                    client.UserToken = user;
+
+                    UserList.Add(user);
+                    this.BeginInvoke(new EventHandler((a, b) =>
                     {
-                        BinaryFormatter bf = new BinaryFormatter();
-                        MemoryStream ms = new MemoryStream(p2pbyte);
-                        DataTable dt = bf.Deserialize(ms) as DataTable;
-                        for (int i = 0; i < dt.Rows.Count; i++)
-                        {
-                            string str = dt.Rows[i].ItemArray[13].ToString();
-                            string str2;
-                            str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
-                            str = str.Replace(str2, "");
-                            str2 = str2.Replace(" ", "");
-                            dt.Rows[i]["地址"] = str2 + str;
-                            string product = dt.Rows[i]["产品名称"].ToString();
-                            string Logistical = dt.Rows[i]["物流公司"].ToString();
-                            dt.Rows[i]["产品名称"] = product.Split('（')[0];
-                            dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
-                        }
+                        this.textBox1.AppendText(client.Host + ":" + client.Port + "-" + client.Key + " 连接");
+                    }));
+                }
+
+
+
+                if (user != null)
+                {
+                
+                    user.Stream.Write(data);
+                    string s = Encoding.Default.GetString(data);
+                    int index = s.LastIndexOf("☆");//这里假设的是使用"END"作为结束字符序列的
+                p2pms.Write(data, 0, data.Length);
+               if (index > 0)
+                    {
+                p2pms.Position -= Encoding.Default.GetBytes("☆").Length;
+                BinaryFormatter bf = new BinaryFormatter();
+                    p2pms.Position = 0;
+                        DataTable dt = bf.Deserialize(p2pms) as DataTable;
+                        //for (int i = 0; i < dt.Rows.Count; i++)
+                        //{
+                        //    string str = dt.Rows[i].ItemArray[13].ToString();
+                        //    string str2;
+                        //    str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
+                        //    str = str.Replace(str2, "");
+                        //    str2 = str2.Replace(" ", "");
+                        //    dt.Rows[i]["地址"] = str2 + str;
+                        //    string product = dt.Rows[i]["产品名称"].ToString();
+                        //    string Logistical = dt.Rows[i]["物流公司"].ToString();
+                        //    dt.Rows[i]["产品名称"] = product.Split('（')[0];
+                        //    dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
+                        //}
                         ExcelExport(dt);
-                        p2pbyte = null;
                     }
-                    Thread.Sleep(1000);
+
                 }
-
-
-
-
-
-            }
-            catch (System.Exception ex)
-            {
-                notifyIcon1.ShowBalloonTip(2000, "提示", ex.Message, ToolTipIcon.Error);
-            }
-        }
-
-        public static void NewMethod(byte[] ms)
-        {
-           p2pbyte= ms;
-           
-        }
-
-        IWorkbook workbook;
-        private void OnUserChanged(UserCollection user)
-        {
-            Users = user;
-        }
-        private void WriteLog(string msg)
-        {
-            log = log + msg+ "\r\n";
-        }
-       
-        public static byte[] Read2Buffer(Stream stream, int BufferLen)
-        {
-            // 如果指定的无效长度的缓冲区，则指定一个默认的长度作为缓存大小
-            if (BufferLen < 1)
-            {
-                BufferLen = 0x8000;
-            }
-
-            // 初始化一个缓存区
-            byte[] buffer = new byte[BufferLen];
-            int read = 0;
-            int block;
-
-            // 每次从流中读取缓存大小的数据，直到读取完所有的流为止
-            while ((block = stream.Read(buffer, read, buffer.Length - read)) > 0)
-            {
-                // 重新设定读取位置
-                read += block;
-
-                // 检查是否到达了缓存的边界，检查是否还有可以读取的信息
-                if (read == buffer.Length)
+                else
                 {
-                    // 尝试读取一个字节
-                    int nextByte = stream.ReadByte();
-
-                    // 读取失败则说明读取完成可以返回结果
-                    if (nextByte == -1)
+                    if (!client.IsProxy)
                     {
-                        return buffer;
+                        client.Sock.Close();
                     }
-
-                    // 调整数组大小准备继续读取
-                    byte[] newBuf = new byte[buffer.Length * 2];
-                    System.Array.Copy(buffer, newBuf, buffer.Length);
-                    newBuf[read] = (byte)nextByte;
-
-                    // buffer是一个引用（指针），这里意在重新设定buffer指针指向一个更大的内存
-                    buffer = newBuf;
-                    read++;
                 }
-            }
-
-            // 如果缓存太大则使用ret来收缩前面while读取的buffer，然后直接返回
-            byte[] ret = new byte[read];
-            System.Array.Copy(buffer, ret, read);
-            return ret;
+            //}
+            //catch (Exception er)
+            //{
+            //    this.BeginInvoke(new EventHandler((a, b) =>
+            //    {
+            //        this.textBox1.AppendText(er.ToString() + "\r\n");
+            //    }));
+            //}
         }
+
+        void LogOut_Action(string message, ActionType type)
+        {
+            this.BeginInvoke(new EventHandler((a, b) =>
+            {
+                this.textBox1.AppendText(message + "\r\n");
+            }));
+        }
+        IWorkbook workbook;
         public System.Data.DataTable ImportExcelFile(string filepath,string mode)
         {
           
@@ -695,8 +695,7 @@ namespace XAYEXCELS
      
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
-            if (_client != null)
-                _client.Logout();
+            
             this.Close();
             notifyIcon1.Visible = false;
         }     
@@ -909,21 +908,6 @@ namespace XAYEXCELS
         {
             new Form2().Show();
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            if (arg != null)
-            {
-                this.Visible = false;
-                this.ShowInTaskbar = false;
-            }
-        }
-
-        private void textBox1_Click(object sender, EventArgs e)
-        {
-            textBox1.Text = log;
-        }
-
         private void restart_Click(object sender, EventArgs e)
         {
             
@@ -957,7 +941,7 @@ namespace XAYEXCELS
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            textBox1.Text = log;
+            //textBox1.Text = log;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -1283,6 +1267,27 @@ namespace XAYEXCELS
                 }
             }
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+            string filename = openFileDialog1.FileName;
+            string exportname = filename.Replace(openFileDialog1.SafeFileName, "") + "生成.xls";
+            DataTable dt = ImportExcelFilesingle(filename);
+            MemoryStream ms = new MemoryStream();
+            BinaryFormatter bf = new BinaryFormatter();
+            bf.Serialize(ms, dt);
+            byte[] tableBT = ms.ToArray();
+          
+            List<string> userlist = MClient.GetAllUser();
+            
+            foreach (var item in userlist)
+            {
+                MClient.SendData(item, tableBT);
+                byte[] endByte = Encoding.Default.GetBytes("END");
+                MClient.SendData(item, endByte);
+            }
         }
     }
    

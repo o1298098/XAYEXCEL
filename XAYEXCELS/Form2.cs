@@ -19,8 +19,8 @@ namespace XAYEXCELS
         public Form2()
         {
             InitializeComponent();
-          
-            
+
+
         }
         public static bool WriteToXml(DataTable dt, string address)
         {
@@ -126,32 +126,37 @@ namespace XAYEXCELS
             }
             return dt;
         }
-       
 
-        private void button1_Click(object sender, EventArgs e)
+
+        private void button1_Click(object sender, EventArgs e)//保存
         {
             DataTable dt = dataGridView1.DataSource as DataTable;
-            WriteToXml(dt, sysstr + "\\DataTable.xml");             
-            DataTable dt2 = new DataTable("option");          
-            dt2.Columns.Add("value");           
+            WriteToXml(dt, sysstr + "XAYXML\\DataTable.xml");
+            dt = productGridView.DataSource as DataTable;
+            WriteToXml(dt, sysstr + "XAYXML\\wldt.xml");
+            DataTable dt2 = new DataTable("option");
+            dt2.Columns.Add("value");
             dt2.Rows.Add(TBY.Text);
             dt2.Rows.Add(TYO.Text);
             dt2.Rows.Add(checkBox1.Checked);
             dt2.Rows.Add(checkBox2.Checked);
             dt2.Rows.Add(rbyewu.Checked);
             dt2.Rows.Add(rbshouhou.Checked);
-            dt2.Rows.Add(textBox1.Text);
-            WriteToXml(dt2, sysstr + "\\Option.xml");
+            WriteToXml(dt2, sysstr + "XAYXML\\Option.xml");
+            dt = comboBox1.DataSource as DataTable;
+            WriteToXml(dt, sysstr + "XAYXML\\droplist.xml");
+            dt = customerGridView.DataSource as DataTable;
+            DataRowView selectitem = comboBox1.SelectedItem as DataRowView;
+            WriteToXml(dt, sysstr + "XAYXML\\" + selectitem.Row.ItemArray[0] + ".xml");
             this.Close();
         }
 
         private void Form2_Load(object sender, EventArgs e)
         {
-           
-            DataTable dt = ReadFromXml(sysstr + "\\Option.xml");
+
+            DataTable dt = ReadFromXml(sysstr + "XAYXML\\Option.xml");
             TBY.Text = dt.Rows[0].ItemArray[0].ToString();
             TYO.Text = dt.Rows[1].ItemArray[0].ToString();
-            textBox1.Text = dt.Rows[6].ItemArray[0].ToString();
             if (dt.Rows[2].ItemArray[0].ToString() == "True")
             {
                 checkBox1.Checked = true;
@@ -169,22 +174,29 @@ namespace XAYEXCELS
                 rbshouhou.Checked = true;
             }
 
-            DataTable dt2 = ReadFromXml(sysstr + "\\DataTable.xml");
-            dataGridView1.DataSource = dt2;
-           
-        }    
-     
+            DataTable dtdali = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
+            dataGridView1.DataSource = dtdali;
+            DataTable dtwuliao = ReadFromXml(sysstr + "XAYXML\\wldt.xml");
+            productGridView.DataSource = dtwuliao;
+            DataTable droplistdt = ReadFromXml(sysstr + "XAYXML\\droplist.xml");
+            comboBox1.DataSource = droplistdt;
+            comboBox1.DisplayMember = "chance";
+            comboBox1.ValueMember = "chance";
+
+
+        }
+
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
 
-            DataTable dt = dataGridView1.DataSource as DataTable;          
-            WriteToXml(dt, sysstr + "\\DataTable.xml");           
+            DataTable dt = dataGridView1.DataSource as DataTable;
+            WriteToXml(dt, sysstr + "XAYXML\\DataTable.xml");
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             folderBrowserDialog1.ShowDialog();
-            TBY.Text=folderBrowserDialog1.SelectedPath ;
+            TBY.Text = folderBrowserDialog1.SelectedPath;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -218,14 +230,75 @@ namespace XAYEXCELS
             }
             catch (Exception ex)
             {
-                MessageBox.Show("请在管理员模式下修改才能生效","提示");
-              
+                MessageBox.Show("请在管理员模式下修改才能生效", "提示");
+
             }
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void creatlink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            DataTable dt = new DataTable("CUSTOMER");
+            dt.Columns.Add("物料名称");
+            dt.Columns.Add("物料编码");
+            dt.Columns.Add("代理价");
+            dt.Rows.Add("");
+            string address = sysstr + "XAYXML\\" + comboBox1.Text + ".xml";
+            if (!File.Exists(address))
+            {
+                WriteToXml(dt, address);
+                dt = comboBox1.DataSource as DataTable;
+                dt.Rows.Add(comboBox1.Text);
+                comboBox1.DataSource = dt;
+                customerGridView.DataSource = ReadFromXml(sysstr + "XAYXML\\" + comboBox1.Text + ".xml");
+                dt = comboBox1.DataSource as DataTable;
+                WriteToXml(dt, sysstr + "XAYXML\\droplist.xml");
+            }
+
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            DataRowView selectitem = comboBox1.SelectedItem as DataRowView;
+            customerGridView.DataSource = ReadFromXml(sysstr + "XAYXML\\" + selectitem.Row.ItemArray[0] + ".xml");
+
+        }
+
+        private void deletelink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)//删除方案
+        {
+            DataRowView selectitem = comboBox1.SelectedItem as DataRowView;
+            string address = sysstr + "XAYXML\\" + selectitem.Row.ItemArray[0] + ".xml";
+            File.Delete(address);
+            DataTable dt = comboBox1.DataSource as DataTable;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (dt.Rows[i].ItemArray[0] == selectitem.Row.ItemArray[0])
+                {
+                    dt.Rows.RemoveAt(i);
+                }
+            }
+            comboBox1.DataSource = dt;
+            WriteToXml(dt, sysstr + "XAYXML\\droplist.xml");
+        }
+
+        private void copylink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string address = sysstr + "XAYXML\\" + comboBox1.Text + ".xml";
+            if (!File.Exists(address))
+            {
+                DataTable dt = customerGridView.DataSource as DataTable;
+                WriteToXml(dt, sysstr + "XAYXML\\" + comboBox1.Text + ".xml");
+                dt = comboBox1.DataSource as DataTable;
+                dt.Rows.Add(comboBox1.Text);
+                comboBox1.DataSource = dt;
+                dt = comboBox1.DataSource as DataTable;
+                WriteToXml(dt, sysstr + "XAYXML\\droplist.xml");
+            }
         }
     }
 }

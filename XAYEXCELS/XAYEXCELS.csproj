@@ -13,7 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <PublishUrl>F:\excelapp\v1.02\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -82,19 +83,6 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\bin\Debug\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Kingdee.BOS">
-      <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.dll</HintPath>
-    </Reference>
-    <Reference Include="Kingdee.BOS.Core">
-      <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Kingdee.BOS.WebApi.Client, Version=6.1.58.7, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\软件\k3\ManageSite\bin\Kingdee.BOS.WebApi.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Kingdee.BOS.WebApi.ServicesStub">
-      <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.WebApi.ServicesStub.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -114,6 +102,14 @@
     <Reference Include="NPOI.OpenXmlFormats">
       <HintPath>..\..\ExcelWorkbook4\ExcelWorkbook4\bin\Debug\NPOI.OpenXmlFormats.dll</HintPath>
     </Reference>
+    <Reference Include="P2PCLIENT, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCLIENT.dll</HintPath>
+    </Reference>
+    <Reference Include="P2PCMD, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCMD.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -124,12 +120,16 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="UDPCOMMON">
-      <HintPath>C:\Users\admin\Source\Repos\UDPNAT\UDPCOMMON\bin\Debug\UDPCOMMON.dll</HintPath>
+    <Reference Include="ZYSocketClientB, Version=0.4.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\ZYSocketClientB.dll</HintPath>
+    </Reference>
+    <Reference Include="ZYSocketShare, Version=0.4.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\ZYSocketShare.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,6 +144,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -160,20 +161,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="app.manifest" />
     <None Include="Properties\app.manifest" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

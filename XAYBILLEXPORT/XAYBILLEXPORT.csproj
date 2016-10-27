@@ -45,6 +45,15 @@
     <Reference Include="Kingdee.BOS.ServiceHelper">
       <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.ServiceHelper.dll</HintPath>
     </Reference>
+    <Reference Include="P2PCLIENT">
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCLIENT.dll</HintPath>
+    </Reference>
+    <Reference Include="P2PCMD">
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCMD.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -54,12 +63,14 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UDPCOMMON">
-      <HintPath>C:\Users\admin\Source\Repos\UDPNAT\UDPCOMMON\bin\Debug\UDPCOMMON.dll</HintPath>
+    <Reference Include="ZYSocketClientB">
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\ZYSocketClientB.dll</HintPath>
+    </Reference>
+    <Reference Include="ZYSocketShare">
+      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\ZYSocketShare.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XAYBILLEXPORT.cs" />
   </ItemGroup>

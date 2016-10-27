@@ -258,13 +258,13 @@ namespace UDPNATCLIENT
             var ms = new MemoryStream();
             binaryF.Serialize(ms, msg);
             ms.Seek(0, SeekOrigin.Begin);
-            byte[] buffer = new byte[1024];
-            while (ms.Read(buffer, 0, 1024) > 0)
+            byte[] buffer = new byte[4096];
+            while (ms.Read(buffer, 0, 4096) > 0)
             {
                 try
                 {
                     _client.Send(buffer, buffer.Length, remoteIP);
-                   
+                    break;
                 }
                 catch(Exception ex)
                 {

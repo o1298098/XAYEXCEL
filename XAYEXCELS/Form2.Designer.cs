@@ -48,13 +48,25 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.deletelink = new System.Windows.Forms.LinkLabel();
+            this.customerGridView = new System.Windows.Forms.DataGridView();
+            this.creatlink = new System.Windows.Forms.LinkLabel();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.productGridView = new System.Windows.Forms.DataGridView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copylink = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.customerGridView)).BeginInit();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.productGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -215,52 +227,135 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(2, 12);
+            this.tabControl1.Location = new System.Drawing.Point(12, 20);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(645, 506);
+            this.tabControl1.Size = new System.Drawing.Size(657, 506);
             this.tabControl1.TabIndex = 11;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.textBox1);
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.groupBox2);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(637, 480);
+            this.tabPage1.Size = new System.Drawing.Size(649, 480);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "常规";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.groupBox4);
+            this.tabPage2.Controls.Add(this.groupBox3);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(637, 480);
+            this.tabPage2.Size = new System.Drawing.Size(649, 480);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "方案";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // textBox1
+            // groupBox4
             // 
-            this.textBox1.Location = new System.Drawing.Point(384, 22);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(121, 21);
-            this.textBox1.TabIndex = 10;
+            this.groupBox4.Controls.Add(this.copylink);
+            this.groupBox4.Controls.Add(this.deletelink);
+            this.groupBox4.Controls.Add(this.customerGridView);
+            this.groupBox4.Controls.Add(this.creatlink);
+            this.groupBox4.Controls.Add(this.comboBox1);
+            this.groupBox4.Location = new System.Drawing.Point(6, 174);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(611, 291);
+            this.groupBox4.TabIndex = 1;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "代理方案";
+            // 
+            // deletelink
+            // 
+            this.deletelink.AutoSize = true;
+            this.deletelink.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.deletelink.Location = new System.Drawing.Point(528, 24);
+            this.deletelink.Name = "deletelink";
+            this.deletelink.Size = new System.Drawing.Size(77, 12);
+            this.deletelink.TabIndex = 3;
+            this.deletelink.TabStop = true;
+            this.deletelink.Text = "删除当前方案";
+            this.deletelink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.deletelink_LinkClicked);
+            // 
+            // customerGridView
+            // 
+            this.customerGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.customerGridView.Location = new System.Drawing.Point(16, 46);
+            this.customerGridView.Name = "customerGridView";
+            this.customerGridView.RowTemplate.Height = 23;
+            this.customerGridView.Size = new System.Drawing.Size(585, 228);
+            this.customerGridView.TabIndex = 2;
+            // 
+            // creatlink
+            // 
+            this.creatlink.AutoSize = true;
+            this.creatlink.LinkColor = System.Drawing.Color.Black;
+            this.creatlink.Location = new System.Drawing.Point(136, 24);
+            this.creatlink.Name = "creatlink";
+            this.creatlink.Size = new System.Drawing.Size(53, 12);
+            this.creatlink.TabIndex = 1;
+            this.creatlink.TabStop = true;
+            this.creatlink.Text = "新建方案";
+            this.creatlink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.creatlink_LinkClicked);
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(16, 20);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(114, 20);
+            this.comboBox1.TabIndex = 0;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.productGridView);
+            this.groupBox3.Location = new System.Drawing.Point(6, 18);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(298, 150);
+            this.groupBox3.TabIndex = 0;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "物料";
+            // 
+            // productGridView
+            // 
+            this.productGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
+            this.productGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.productGridView.Location = new System.Drawing.Point(16, 20);
+            this.productGridView.Name = "productGridView";
+            this.productGridView.RowTemplate.Height = 23;
+            this.productGridView.Size = new System.Drawing.Size(265, 108);
+            this.productGridView.TabIndex = 0;
             // 
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
+            // copylink
+            // 
+            this.copylink.AutoSize = true;
+            this.copylink.LinkColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.copylink.Location = new System.Drawing.Point(195, 24);
+            this.copylink.Name = "copylink";
+            this.copylink.Size = new System.Drawing.Size(53, 12);
+            this.copylink.TabIndex = 4;
+            this.copylink.TabStop = true;
+            this.copylink.Text = "复制方案";
+            this.copylink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.copylink_LinkClicked);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(659, 567);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(681, 567);
             this.ControlBox = false;
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.button4);
@@ -276,7 +371,12 @@
             this.groupBox2.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.customerGridView)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.productGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -302,7 +402,14 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.DataGridView productGridView;
+        private System.Windows.Forms.DataGridView customerGridView;
+        private System.Windows.Forms.LinkLabel creatlink;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.LinkLabel deletelink;
+        private System.Windows.Forms.LinkLabel copylink;
     }
 }
