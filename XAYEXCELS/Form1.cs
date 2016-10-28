@@ -17,6 +17,7 @@ using ZYSocket.share;
 using XAYEXCELS.Properties;
 using System.Text;
 
+
 namespace XAYEXCELS
 {
     public partial class Form1 : Form
@@ -89,8 +90,8 @@ namespace XAYEXCELS
 
          void client_ClientDataIn(string key, ConClient client, byte[] data)
         {
-            //try
-            //{
+            try
+            {
                 UserInfo user = client.UserToken as UserInfo;
 
                 if (user == null && client.IsProxy)
@@ -104,15 +105,12 @@ namespace XAYEXCELS
                     user.MainClient = MClient;
                     user.Stream = new ZYSocket.share.ZYNetRingBufferPoolV2(1073741824);
                     client.UserToken = user;
-
                     UserList.Add(user);
                     this.BeginInvoke(new EventHandler((a, b) =>
                     {
                         this.textBox1.AppendText(client.Host + ":" + client.Port + "-" + client.Key + " 连接");
                     }));
                 }
-
-
 
                 if (user != null)
                 {
@@ -121,26 +119,31 @@ namespace XAYEXCELS
                     string s = Encoding.Default.GetString(data);
                     int index = s.LastIndexOf("☆");//这里假设的是使用"END"作为结束字符序列的
                 p2pms.Write(data, 0, data.Length);
-               if (index > 0)
+                    if (index > 0)
                     {
-                p2pms.Position -= Encoding.Default.GetBytes("☆").Length;
-                BinaryFormatter bf = new BinaryFormatter();
-                    p2pms.Position = 0;
+                        p2pms.Position -= Encoding.Default.GetBytes("☆").Length;
+                        BinaryFormatter bf = new BinaryFormatter();
+                        p2pms.Position = 0;
                         DataTable dt = bf.Deserialize(p2pms) as DataTable;
-                        //for (int i = 0; i < dt.Rows.Count; i++)
-                        //{
-                        //    string str = dt.Rows[i].ItemArray[13].ToString();
-                        //    string str2;
-                        //    str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
-                        //    str = str.Replace(str2, "");
-                        //    str2 = str2.Replace(" ", "");
-                        //    dt.Rows[i]["地址"] = str2 + str;
-                        //    string product = dt.Rows[i]["产品名称"].ToString();
-                        //    string Logistical = dt.Rows[i]["物流公司"].ToString();
-                        //    dt.Rows[i]["产品名称"] = product.Split('（')[0];
-                        //    dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
-                        //}
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            string str = dt.Rows[i].ItemArray[13].ToString();
+                            string str2;
+                            //去除地址栏的空格
+                            str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
+                            str = str.Replace(str2, "");
+                            str2 = str2.Replace(" ", "");
+                            dt.Rows[i]["地址"] = str2 + str;
+                            runreplace run = new runreplace();
+                            string product = dt.Rows[i]["产品名称"].ToString();
+                            string productid = dt.Rows[i]["产品编码"].ToString();
+                            string Logistical = dt.Rows[i]["物流公司"].ToString();
+                            dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
+                            dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
+                        }
                         ExcelExport(dt);
+                        dt.Columns.Add("代理单价");
+                        ExportEasyFY(dt, "", "1");
                     }
 
                 }
@@ -151,14 +154,14 @@ namespace XAYEXCELS
                         client.Sock.Close();
                     }
                 }
-            //}
-            //catch (Exception er)
-            //{
-            //    this.BeginInvoke(new EventHandler((a, b) =>
-            //    {
-            //        this.textBox1.AppendText(er.ToString() + "\r\n");
-            //    }));
-            //}
+            }
+            catch (Exception er)
+            {
+                this.BeginInvoke(new EventHandler((a, b) =>
+                {
+                    this.textBox1.AppendText(er.ToString() + "\r\n");
+                }));
+            }
         }
 
         void LogOut_Action(string message, ActionType type)
@@ -751,7 +754,8 @@ namespace XAYEXCELS
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
             string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-            DataTable option = ReadFromXml(sysstr + "\\Option.xml");
+            DataTable option = ReadFromXml(sysstr + "XAYXML\\Option.xml");
+            DataTable dailidt = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
             string filepathInput = option.Rows[0].ItemArray[0].ToString();
             string filepath = option.Rows[1].ItemArray[0].ToString();
             string daydir = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日";           
@@ -772,7 +776,6 @@ namespace XAYEXCELS
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
             log = log + DateTime.Now.ToLongTimeString() + "  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
-            DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");
             string[] emailarr = new string[dailidt.Rows.Count];
             for (int k = 0; k < dailidt.Rows.Count; k++)
             {
@@ -823,7 +826,7 @@ namespace XAYEXCELS
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
             string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-            DataTable option = ReadFromXml(sysstr + "\\Option.xml");
+            DataTable option = ReadFromXml(sysstr + "XAYXML\\Option.xml");
             string filepathInput = option.Rows[0].ItemArray[0].ToString();
             string filepath = option.Rows[1].ItemArray[0].ToString();
             string daydir = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日";

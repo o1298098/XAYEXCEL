@@ -173,17 +173,27 @@ namespace XAYEXCELS
             {
                 rbshouhou.Checked = true;
             }
-
-            DataTable dtdali = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
-            dataGridView1.DataSource = dtdali;
-            DataTable dtwuliao = ReadFromXml(sysstr + "XAYXML\\wldt.xml");
-            productGridView.DataSource = dtwuliao;
-            DataTable droplistdt = ReadFromXml(sysstr + "XAYXML\\droplist.xml");
-            comboBox1.DataSource = droplistdt;
-            comboBox1.DisplayMember = "chance";
-            comboBox1.ValueMember = "chance";
-
-
+            try
+            {
+                DataTable droplistdt = ReadFromXml(sysstr + "XAYXML\\droplist.xml");
+                comboBox1.DataSource = droplistdt;
+                comboBox1.DisplayMember = "chance";
+                comboBox1.ValueMember = "chance";
+                DataGridViewComboBoxColumn comUserName = new DataGridViewComboBoxColumn();
+                comUserName.DataPropertyName = "代理方案";
+                comUserName.HeaderText = "代理方案";
+                comUserName.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                comUserName.DataSource = droplistdt;
+                comUserName.DisplayMember = "chance";
+                comUserName.ValueMember = "chance";
+                dataGridView1.Columns.Add(comUserName);
+                DataTable dtdali = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
+                dataGridView1.DataSource = dtdali;
+                DataTable dtwuliao = ReadFromXml(sysstr + "XAYXML\\wldt.xml");
+                productGridView.DataSource = dtwuliao;
+            }
+            catch { }
+           
         }
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
