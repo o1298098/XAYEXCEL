@@ -90,8 +90,8 @@ namespace XAYEXCELS
 
          void client_ClientDataIn(string key, ConClient client, byte[] data)
         {
-            try
-            {
+            //try
+            //{
                 UserInfo user = client.UserToken as UserInfo;
 
                 if (user == null && client.IsProxy)
@@ -123,9 +123,21 @@ namespace XAYEXCELS
                     {
                         p2pms.Position -= Encoding.Default.GetBytes("☆").Length;
                         BinaryFormatter bf = new BinaryFormatter();
+                        runreplace run = new runreplace();
                         p2pms.Position = 0;
                         DataTable dt = bf.Deserialize(p2pms) as DataTable;
-                        for (int i = 0; i < dt.Rows.Count; i++)
+                        dt.Columns[3].ColumnName = "产品编码";
+                        dt.Columns[4].ColumnName = "拿货单价";
+                        dt.Columns[5].ColumnName = "结算费用";
+                        dt.Columns[6].ColumnName = "物流公司";
+                        dt.Columns[9].ColumnName = "业务员";
+                        dt.Columns[10].ColumnName = "省";
+                        dt.Columns[11].ColumnName = "市";
+                        dt.Columns[12].ColumnName = "区";
+                        dt.Columns[14].ColumnName = "姓名";
+                        dt.Columns[15].ColumnName = "手机";
+                    //dt.Columns[17].ColumnName = "注释";
+                    for (int i = 0; i < dt.Rows.Count; i++)
                         {
                             string str = dt.Rows[i].ItemArray[13].ToString();
                             string str2;
@@ -134,16 +146,18 @@ namespace XAYEXCELS
                             str = str.Replace(str2, "");
                             str2 = str2.Replace(" ", "");
                             dt.Rows[i]["地址"] = str2 + str;
-                            runreplace run = new runreplace();
                             string product = dt.Rows[i]["产品名称"].ToString();
+                            string date = dt.Rows[i]["日期"].ToString().Substring(0, 8);
                             string productid = dt.Rows[i]["产品编码"].ToString();
                             string Logistical = dt.Rows[i]["物流公司"].ToString();
+                            dt.Rows[i].ItemArray[0]= date;
                             dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
                             dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
                         }
                         ExcelExport(dt);
                         dt.Columns.Add("代理单价");
-                        ExportEasyFY(dt, "", "1");
+                        run.replacedt(dt);
+                        ExportEasyFY(dt, "F:\\cs.xls", "1");
                     }
 
                 }
@@ -154,14 +168,14 @@ namespace XAYEXCELS
                         client.Sock.Close();
                     }
                 }
-            }
-            catch (Exception er)
-            {
-                this.BeginInvoke(new EventHandler((a, b) =>
-                {
-                    this.textBox1.AppendText(er.ToString() + "\r\n");
-                }));
-            }
+            //}
+            //catch (Exception er)
+            //{
+            //    this.BeginInvoke(new EventHandler((a, b) =>
+            //    {
+            //        this.textBox1.AppendText(er.ToString() + "\r\n");
+            //    }));
+            //}
         }
 
         void LogOut_Action(string message, ActionType type)
@@ -1129,7 +1143,7 @@ namespace XAYEXCELS
                     for (int j = 0; j < dtSource.Columns.Count; j++)
                     {
                         string dtcellvalue = dtSource.Rows[i][j].ToString();
-                        if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8) && dtcellvalue != "")
+                        if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8||j==17) && dtcellvalue != "")
                         {
 
                             dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
@@ -1179,7 +1193,7 @@ namespace XAYEXCELS
             sheet.SetAutoFilter(range);
             //生成代理工作表
             string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-            DataTable dailidt = ReadFromXml(sysstr + "\\DataTable.xml");
+            DataTable dailidt = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
             string[] emailarr = new string[dailidt.Rows.Count];
             for (int k = 0; k < dailidt.Rows.Count; k++)
             {
@@ -1199,7 +1213,7 @@ namespace XAYEXCELS
                 dtNew.Columns.Remove("区");
                 dtNew.Columns.Remove("姓名");
                 dtNew.Columns.Remove("手机");
-                dtNew.Columns.Remove("注释");
+                //dtNew.Columns.Remove("注释");
                 if (drArr.Length == 0)
                     continue;
                 for (int i = 0; i < drArr.Length; i++)
@@ -1231,7 +1245,7 @@ namespace XAYEXCELS
                         for (int j = 0; j < dtNew.Columns.Count; j++)
                         {
                             string dtcellvalue = dtNew.Rows[i][j].ToString();
-                            if ((j == 2 || j == 3 || j == 5||j==6) && dtcellvalue != "")
+                            if ((j == 2 || j == 3 || j == 5||j==6||j==10) && dtcellvalue != "")
                             {
 
                                 dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
@@ -1246,7 +1260,7 @@ namespace XAYEXCELS
                             }
                             //
 
-
+                        
                         }
 
                     }
@@ -1274,23 +1288,25 @@ namespace XAYEXCELS
 
         private void button2_Click(object sender, EventArgs e)
         {
-            openFileDialog1.ShowDialog();
-            string filename = openFileDialog1.FileName;
-            string exportname = filename.Replace(openFileDialog1.SafeFileName, "") + "生成.xls";
-            DataTable dt = ImportExcelFilesingle(filename);
-            MemoryStream ms = new MemoryStream();
-            BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(ms, dt);
-            byte[] tableBT = ms.ToArray();
-          
-            List<string> userlist = MClient.GetAllUser();
-            
-            foreach (var item in userlist)
-            {
-                MClient.SendData(item, tableBT);
-                byte[] endByte = Encoding.Default.GetBytes("END");
-                MClient.SendData(item, endByte);
-            }
+            runreplace run = new runreplace();
+            run.ExportToProvit();
+            //openFileDialog1.ShowDialog();
+            //string filename = openFileDialog1.FileName;
+            //string exportname = filename.Replace(openFileDialog1.SafeFileName, "") + "生成.xls";
+            //DataTable dt = ImportExcelFilesingle(filename);
+            //MemoryStream ms = new MemoryStream();
+            //BinaryFormatter bf = new BinaryFormatter();
+            //bf.Serialize(ms, dt);
+            //byte[] tableBT = ms.ToArray();
+
+            //List<string> userlist = MClient.GetAllUser();
+
+            //foreach (var item in userlist)
+            //{
+            //    MClient.SendData(item, tableBT);
+            //    byte[] endByte = Encoding.Default.GetBytes("END");
+            //    MClient.SendData(item, endByte);
+            //}
         }
     }
    
