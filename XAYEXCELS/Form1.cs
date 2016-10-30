@@ -157,7 +157,14 @@ namespace XAYEXCELS
                         ExcelExport(dt);
                         dt.Columns.Add("代理价");
                         run.replacedt(dt);
-                        ExportEasyFY(dt, "F:\\cs.xls", "1");
+                    string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+                    DataTable option = ReadFromXml(sysstr + "XAYXML\\Option.xml");
+                    DataTable dailidt = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
+                    string filepathInput = option.Rows[0].ItemArray[0].ToString();
+                    string filepath = option.Rows[1].ItemArray[0].ToString();
+                    string filename = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日\\代理订单"+ DateTime.Now.ToString("yyMMdd") + ".xls";
+                    ExportEasyFY(dt, filename, "1");
+                    run.ExportToProvit(filename);
                     }
 
                 }
@@ -965,7 +972,8 @@ namespace XAYEXCELS
         {
             openFileDialog1.ShowDialog();
             string filename = openFileDialog1.FileName;
-            string exportname = filename.Replace(openFileDialog1.SafeFileName,"") + "生成.xls";
+            string exportname = filename.Replace(openFileDialog1.SafeFileName,"") + "订单总表.xls";
+            runreplace run = new runreplace();
             DataTable dt= ImportExcelFilesingle(filename);
             dt.Columns[3].ColumnName = "产品编码";
             dt.Columns[4].ColumnName = "拿货单价";
@@ -975,6 +983,8 @@ namespace XAYEXCELS
             dt.Columns[14].ColumnName = "姓名";
             dt.Columns[15].ColumnName = "手机";
             dt.Columns[17].ColumnName = "注释";
+            dt.Columns.Add("代理价");
+            run.replacedt(dt);
             ExportEasyFY(dt, exportname, "1");
         }
         public System.Data.DataTable ImportExcelFilesingle(string filePath)
@@ -1289,7 +1299,7 @@ namespace XAYEXCELS
         private void button2_Click(object sender, EventArgs e)
         {
             runreplace run = new runreplace();
-            run.ExportToProvit();
+            //run.ExportToProvit();
             //openFileDialog1.ShowDialog();
             //string filename = openFileDialog1.FileName;
             //string exportname = filename.Replace(openFileDialog1.SafeFileName, "") + "生成.xls";

@@ -59,12 +59,12 @@ namespace XAYEXCELS
         private Microsoft.Office.Interop.Excel.Workbook m_objExcelWorkBook;            
         private Microsoft.Office.Interop.Excel.Worksheet m_objExcelWorkSheet;        
 
-        public void  ExportToProvit()
+        public void  ExportToProvit(string filename)
         {
            
                 m_objExcelApp = new Microsoft.Office.Interop.Excel.Application();
                 m_objExcelApp.DisplayAlerts = false;
-                m_objExcelWorkBook = m_objExcelApp.Workbooks.Open("F:\\cs.xls", Type.Missing,
+                m_objExcelWorkBook = m_objExcelApp.Workbooks.Open(filename, Type.Missing,
                                 true, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                 Type.Missing, Type.Missing);
@@ -86,7 +86,7 @@ namespace XAYEXCELS
 
 
 
-            m_objExcelWorkBook.SaveAs("F:\\cs3.xls");
+            m_objExcelWorkBook.SaveAs(filename);
                 m_objExcelWorkBook.Close();
           
 
