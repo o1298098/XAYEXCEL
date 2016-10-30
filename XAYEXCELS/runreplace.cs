@@ -33,7 +33,7 @@ namespace XAYEXCELS
             {
                 string sales = dt.Rows[i]["业务员"].ToString();
                 DataRow[] dr = productdt.Select("代理名字 like '" + sales.Substring(0, 1) + "%'");
-                dt.Rows[i]["代理单价"] = dt.Rows[i]["拿货单价"].ToString();
+                dt.Rows[i]["代理价"] = Convert.ToInt32(dt.Rows[i].ItemArray[4].ToString()) * Convert.ToInt32(dt.Rows[i].ItemArray[2].ToString());
                 if (dr.Length>0)
                 {
                     plan = dr[0].ItemArray[6].ToString();
@@ -44,7 +44,7 @@ namespace XAYEXCELS
                     {
                             if (plandt.Rows[j].ItemArray[1].ToString()== dt.Rows[i]["产品编码"].ToString())
                             {
-                                dt.Rows[i]["代理单价"] = plandt.Rows[j].ItemArray[2].ToString();
+                                dt.Rows[i]["代理价"] = Convert.ToInt32( plandt.Rows[j].ItemArray[2].ToString())* Convert.ToInt32(dt.Rows[i].ItemArray[2].ToString());
                             }
                          
                     }
@@ -61,23 +61,48 @@ namespace XAYEXCELS
 
         public void  ExportToProvit()
         {
+           
+                m_objExcelApp = new Microsoft.Office.Interop.Excel.Application();
+                m_objExcelApp.DisplayAlerts = false;
+                m_objExcelWorkBook = m_objExcelApp.Workbooks.Open("F:\\cs.xls", Type.Missing,
+                                true, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                Type.Missing, Type.Missing);
+                int sb = m_objExcelApp.Workbooks[1].Worksheets.Count;
+                string[] sheetName = new string[50];
+                string str1;
+                for (int k = 1; k < sb ; k++)
+                {
+                sheetName [k-1]= m_objExcelApp.Worksheets[k + 1].Name;
+               
+            }
+            for (int k = 1; k < sb ; k++)
+            {
+                str1 = sheetName[k - 1];
 
-            m_objExcelApp = new Microsoft.Office.Interop.Excel.Application();
-            m_objExcelApp.DisplayAlerts = false;
-            m_objExcelWorkBook = m_objExcelApp.Workbooks.Open("F:\\cs.xls", Type.Missing,
-                            true, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                            Type.Missing, Type.Missing);
-            m_objExcelWorkSheet = (Worksheet)m_objExcelWorkBook.Sheets["SAM"];
+                NewMethod(str1);
+            
+            }
+
+
+
+            m_objExcelWorkBook.SaveAs("F:\\cs3.xls");
+                m_objExcelWorkBook.Close();
+          
+
+        }
+
+        private void NewMethod(string sheetName)
+        {
+            m_objExcelWorkSheet = (Worksheet)m_objExcelWorkBook.Sheets[sheetName];
+            m_objExcelWorkSheet.Activate();
             PivotCaches objPivot = m_objExcelWorkBook.PivotCaches();
-            objPivot.Add(XlPivotTableSourceType.xlDatabase, "SAM!R1C1:R114C11").CreatePivotTable
-                ("羽翚!R86C1", "数据透视表1", Type.Missing, Type.Missing);
-            m_objExcelWorkBook.PivotTableWizard(Type.Missing, Type.Missing, m_objExcelWorkSheet.Cells[m_objExcelWorkSheet.UsedRange.Rows.Count+3, 1],
-                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-                    Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-            Range objRange = (Range)m_objExcelWorkSheet.Cells[m_objExcelWorkSheet.UsedRange.Rows.Count+3, 1];
+            string rangedata = sheetName + "!R1C1:R" + m_objExcelWorkSheet.UsedRange.Rows.Count + "C11";
+            objPivot.Add(XlPivotTableSourceType.xlDatabase,rangedata).CreatePivotTable
+                (m_objExcelWorkSheet.Cells[m_objExcelWorkSheet.UsedRange.Rows.Count + 3, 1], sheetName+"1", Type.Missing, XlPivotTableVersionList.xlPivotTableVersion15);
+            Range objRange = (Range)m_objExcelWorkSheet.Cells[m_objExcelWorkSheet.UsedRange.Rows.Count + 3, 1];
             objRange.Select();
-            PivotTable objTable = (PivotTable)m_objExcelWorkSheet.PivotTables("数据透视表1");
+            PivotTable objTable = (PivotTable)m_objExcelWorkSheet.PivotTables(sheetName+"1");
             PivotField objField = (PivotField)objTable.PivotFields("产品名称");
             objField.Orientation = XlPivotFieldOrientation.xlRowField;
             objField.Position = "1";
@@ -95,12 +120,7 @@ namespace XAYEXCELS
             objFieldN.Position = "4";
             objTable.DataPivotField.Orientation = XlPivotFieldOrientation.xlColumnField;
             objTable.DataPivotField.Position = "1";
-
-        
-            m_objExcelWorkBook.SaveAs("F:\\cs3.xls");
-            m_objExcelWorkBook.Close();
             
-
         }
-}
+    }
 }

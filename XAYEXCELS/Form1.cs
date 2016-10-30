@@ -155,7 +155,7 @@ namespace XAYEXCELS
                             dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
                         }
                         ExcelExport(dt);
-                        dt.Columns.Add("代理单价");
+                        dt.Columns.Add("代理价");
                         run.replacedt(dt);
                         ExportEasyFY(dt, "F:\\cs.xls", "1");
                     }
