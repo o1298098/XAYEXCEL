@@ -147,10 +147,10 @@ namespace XAYEXCELS
                             str2 = str2.Replace(" ", "");
                             dt.Rows[i]["地址"] = str2 + str;
                             string product = dt.Rows[i]["产品名称"].ToString();
-                            string date = dt.Rows[i]["日期"].ToString().Substring(0, 8);
+                            string date = dt.Rows[i]["日期"].ToString();
                             string productid = dt.Rows[i]["产品编码"].ToString();
                             string Logistical = dt.Rows[i]["物流公司"].ToString();
-                            dt.Rows[i].ItemArray[0]= date;
+                            dt.Rows[i].ItemArray[0]= "bilibi";
                             dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
                             dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
                         }
@@ -721,7 +721,8 @@ namespace XAYEXCELS
         {
             
             this.Close();
-            notifyIcon1.Visible = false;
+            MClient.Mainclient.Sock.Close();
+            //notifyIcon1.Visible = false;
         }     
         private void closetsm_Click(object sender, EventArgs e)
         {
@@ -1299,7 +1300,7 @@ namespace XAYEXCELS
         private void button2_Click(object sender, EventArgs e)
         {
             runreplace run = new runreplace();
-            //run.ExportToProvit();
+            run.ExportToProvit("F:\\代理\\2016.10\\31日\\代理订单161031.xls");
             //openFileDialog1.ShowDialog();
             //string filename = openFileDialog1.FileName;
             //string exportname = filename.Replace(openFileDialog1.SafeFileName, "") + "生成.xls";

@@ -65,7 +65,7 @@ namespace XAYEXCELS
                 m_objExcelApp = new Microsoft.Office.Interop.Excel.Application();
                 m_objExcelApp.DisplayAlerts = false;
                 m_objExcelWorkBook = m_objExcelApp.Workbooks.Open(filename, Type.Missing,
-                                true, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                                false, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                 Type.Missing, Type.Missing);
                 int sb = m_objExcelApp.Workbooks[1].Worksheets.Count;
@@ -115,7 +115,7 @@ namespace XAYEXCELS
             objFieldN = (PivotField)objTable.PivotFields("补快递费用"); //赋值数据区域数据
             objFieldN.Orientation = XlPivotFieldOrientation.xlDataField;
             objFieldN.Position = "3";
-            objFieldN = (PivotField)objTable.PivotFields("代理单价"); //赋值数据区域数据
+            objFieldN = (PivotField)objTable.PivotFields("代理价"); //赋值数据区域数据
             objFieldN.Orientation = XlPivotFieldOrientation.xlDataField;
             objFieldN.Position = "4";
             objTable.DataPivotField.Orientation = XlPivotFieldOrientation.xlColumnField;
