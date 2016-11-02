@@ -126,6 +126,7 @@ namespace XAYEXCELS
                         runreplace run = new runreplace();
                         p2pms.Position = 0;
                         DataTable dt = bf.Deserialize(p2pms) as DataTable;
+                        dt.Columns[0].ColumnName = "日期";
                         dt.Columns[3].ColumnName = "产品编码";
                         dt.Columns[4].ColumnName = "拿货单价";
                         dt.Columns[5].ColumnName = "结算费用";
@@ -137,25 +138,31 @@ namespace XAYEXCELS
                         dt.Columns[14].ColumnName = "姓名";
                         dt.Columns[15].ColumnName = "手机";
                     //dt.Columns[17].ColumnName = "注释";
+                    int timecount = 0;
+                    int timecount2 = 0;
                     for (int i = 0; i < dt.Rows.Count; i++)
                         {
-                            string str = dt.Rows[i].ItemArray[13].ToString();
-                            string str2;
-                            //去除地址栏的空格
-                            str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
-                            str = str.Replace(str2, "");
-                            str2 = str2.Replace(" ", "");
-                            dt.Rows[i]["地址"] = str2 + str;
-                            string product = dt.Rows[i]["产品名称"].ToString();
-                            string date = dt.Rows[i]["日期"].ToString();
-                            string productid = dt.Rows[i]["产品编码"].ToString();
-                            string Logistical = dt.Rows[i]["物流公司"].ToString();
-                            dt.Rows[i].ItemArray[0]= "bilibi";
-                            dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
-                            dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
-                        }
-                        ExcelExport(dt);
-                        dt.Columns.Add("代理价");
+                        string str = dt.Rows[i].ItemArray[13].ToString();
+                        string str2;
+                        //去除地址栏的空格
+                        str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
+                        str = str.Replace(str2, "");
+                        str2 = str2.Replace(" ", "");
+                        dt.Rows[i]["地址"] = str2 + str;
+                        string product = dt.Rows[i]["产品名称"].ToString();
+                        string date = dt.Rows[i]["日期"].ToString();
+                        string productid = dt.Rows[i]["产品编码"].ToString();
+                        string Logistical = dt.Rows[i]["物流公司"].ToString() == "中通" ? "" : dt.Rows[i]["物流公司"].ToString();
+                        dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
+                        dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
+                        if (dt.Rows[i]["补快递费用"].ToString() == "0")
+                        { timecount++; }
+                        if (dt.Rows[i]["补发票费用"].ToString() == "0")
+                        { timecount2++; }
+                    }
+                    dt.Columns.Add("注释");
+                    ExcelExport(dt);
+                    dt.Columns.Add("代理价");
                         run.replacedt(dt);
                     string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
                     DataTable option = ReadFromXml(sysstr + "XAYXML\\Option.xml");
@@ -164,7 +171,9 @@ namespace XAYEXCELS
                     string filepath = option.Rows[1].ItemArray[0].ToString();
                     string filename = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日\\代理订单"+ DateTime.Now.ToString("yyMMdd") + ".xls";
                     ExportEasyFY(dt, filename, "1");
-                    run.ExportToProvit(filename);
+                    bool KD = timecount == dt.Rows.Count;
+                    bool FP = timecount2 == dt.Rows.Count;
+                    run.ExportToProvit(filename,KD,FP);
                     }
 
                 }
@@ -187,10 +196,10 @@ namespace XAYEXCELS
 
         void LogOut_Action(string message, ActionType type)
         {
-            this.BeginInvoke(new EventHandler((a, b) =>
-            {
-                this.textBox1.AppendText(message + "\r\n");
-            }));
+            //this.BeginInvoke(new EventHandler((a, b) =>
+            //{
+            //    this.textBox1.AppendText(message + "\r\n");
+            //}));
         }
         IWorkbook workbook;
         public System.Data.DataTable ImportExcelFile(string filepath,string mode)
@@ -760,7 +769,24 @@ namespace XAYEXCELS
             }
             if (excelmode == "0")
             {
+                runreplace run = new runreplace();
                 ExcelExport(dt);
+                dt.Columns.Add("代理价");
+                run.replacedt(dt);
+                dt.Columns[0].ColumnName = "日期";
+                dt.Columns[3].ColumnName = "产品编码";
+                dt.Columns[4].ColumnName = "拿货单价";
+                dt.Columns[5].ColumnName = "结算费用";
+                dt.Columns[6].ColumnName = "物流公司";
+                dt.Columns[9].ColumnName = "业务员";
+                dt.Columns[10].ColumnName = "省";
+                dt.Columns[11].ColumnName = "市";
+                dt.Columns[12].ColumnName = "区";
+                dt.Columns[14].ColumnName = "姓名";
+                dt.Columns[15].ColumnName = "手机";
+                string filename1 = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日\\代理订单" + DateTime.Now.ToString("yyMMdd") + ".xls";
+                ExportEasyFY(dt, filename1, "2");
+                run.ExportToProvit(filename1, false, false);
             }
             else if (excelmode == "1")
             {
@@ -826,7 +852,7 @@ namespace XAYEXCELS
                 }
                 dtNew.Columns.Remove("结算费用");
                 dtNew.Columns.Remove("拿货单价");
-                //dtNew.Columns.Remove("注释");
+                dtNew.Columns.Remove("注释");
                 strFileName = dailidir + "\\" + emailSubject + "(" + DateTime.Now.ToString("M.dd") + ").xls";
                 ExportEasy(dtNew, strFileName, "2");
                 string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" + email2;
@@ -954,14 +980,15 @@ namespace XAYEXCELS
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             //注意判断关闭事件Reason来源于窗体按钮，否则用菜单退出时无法退出!
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                e.Cancel = true;    //取消"关闭窗口"事件
-                this.WindowState = FormWindowState.Minimized;    //使关闭时窗口向右下角缩小的效果
-                notifyIcon1.Visible = true;
-                this.Hide();
-                return;
-            }
+            //if (e.CloseReason == CloseReason.UserClosing)
+            //{
+            //    e.Cancel = true;    //取消"关闭窗口"事件
+            //    this.WindowState = FormWindowState.Minimized;    //使关闭时窗口向右下角缩小的效果
+            //    notifyIcon1.Visible = true;
+            //    this.Hide();
+            //    return;
+            //}
+           
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -984,11 +1011,42 @@ namespace XAYEXCELS
             dt.Columns[14].ColumnName = "姓名";
             dt.Columns[15].ColumnName = "手机";
             dt.Columns[17].ColumnName = "注释";
+            int timecount = 0;
+            int timecount2 = 0;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                //string str = dt.Rows[i].ItemArray[13].ToString();
+                //string str2;
+                ////去除地址栏的空格
+                //str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
+                //str = str.Replace(str2, "");
+                //str2 = str2.Replace(" ", "");
+                //dt.Rows[i]["地址"] = str2 + str;
+                string product = dt.Rows[i]["产品名称"].ToString();
+                string productid = dt.Rows[i]["产品编码"].ToString();
+                string Logistical = dt.Rows[i]["物流公司"].ToString() == "中通" ? "" : dt.Rows[i]["物流公司"].ToString();
+                dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
+                dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
+                if (dt.Rows[i]["补快递费用"].ToString() == "0")
+                { timecount++; }
+                if (dt.Rows[i]["补发票费用"].ToString() == "0")
+                { timecount2++; }
+            }
             dt.Columns.Add("代理价");
             run.replacedt(dt);
-            ExportEasyFY(dt, exportname, "1");
+            string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
+            DataTable option = ReadFromXml(sysstr + "XAYXML\\Option.xml");
+            DataTable dailidt = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
+            string filepathInput = option.Rows[0].ItemArray[0].ToString();
+            string filepath = option.Rows[1].ItemArray[0].ToString();
+            string filename1 = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日\\代理订单" + DateTime.Now.ToString("yyMMdd") + ".xls";
+
+            ExportEasyFY(dt, filename, "2");
+            bool KD = timecount == dt.Rows.Count;
+            bool FP = timecount2 == dt.Rows.Count;
+            run.ExportToProvit(filename1, KD, FP);
         }
-        public System.Data.DataTable ImportExcelFilesingle(string filePath)
+        public DataTable ImportExcelFilesingle(string filePath)
         {
 
            
@@ -1163,7 +1221,7 @@ namespace XAYEXCELS
 
 
                         }
-                        else if (exceltype == "2" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
+                        else if (exceltype == "2" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8 || j == 18) && dtcellvalue != "")
                         {
 
                             dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
@@ -1189,7 +1247,7 @@ namespace XAYEXCELS
                     }
 
                 }
-            }
+        }
             catch (Exception ex)
             {
 
@@ -1198,7 +1256,7 @@ namespace XAYEXCELS
                 throw ex;
             }
 
-            //sheet.ForceFormulaRecalculation = true;
+    sheet.ForceFormulaRecalculation = true;
             sheet.CreateFreezePane(3, 1, 3, 1);
             CellRangeAddress range = CellRangeAddress.ValueOf("A1:Q1");
             sheet.SetAutoFilter(range);
@@ -1224,7 +1282,7 @@ namespace XAYEXCELS
                 dtNew.Columns.Remove("区");
                 dtNew.Columns.Remove("姓名");
                 dtNew.Columns.Remove("手机");
-                //dtNew.Columns.Remove("注释");
+                dtNew.Columns.Remove("注释");
                 if (drArr.Length == 0)
                     continue;
                 for (int i = 0; i < drArr.Length; i++)
@@ -1300,7 +1358,7 @@ namespace XAYEXCELS
         private void button2_Click(object sender, EventArgs e)
         {
             runreplace run = new runreplace();
-            run.ExportToProvit("F:\\代理\\2016.10\\31日\\代理订单161031.xls");
+            //run.ExportToProvit("F:\\代理\\2016.10\\31日\\代理订单161031.xls");
             //openFileDialog1.ShowDialog();
             //string filename = openFileDialog1.FileName;
             //string exportname = filename.Replace(openFileDialog1.SafeFileName, "") + "生成.xls";
