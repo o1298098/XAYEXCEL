@@ -314,6 +314,7 @@ namespace XAYEXCELS
             }
                 catch (Exception ex)
             {
+                this.textBox1.AppendText("运行失败，excel文件单元格格式有误");
                 notifyIcon1.ShowBalloonTip(2000, "提示", "运行失败，excel文件单元格格式有误", ToolTipIcon.Error);
                 log = log + DateTime.Now.ToLongTimeString() + "  运行失败，excel文件单元格格式有误\r\n";
                 break;
@@ -993,7 +994,7 @@ namespace XAYEXCELS
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //textBox1.Text = log;
+            textBox1.Text = log;
         }
 
         private void button1_Click(object sender, EventArgs e)

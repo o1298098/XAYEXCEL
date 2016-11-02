@@ -45,7 +45,7 @@ namespace XAYEXCELS
                             {
                                 if (plandt.Rows[j].ItemArray[1].ToString() == dt.Rows[i]["产品编码"].ToString())
                                 {
-                                    dt.Rows[i]["代理价"] = Convert.ToInt32(plandt.Rows[j].ItemArray[2].ToString()) * Convert.ToInt32(dt.Rows[i].ItemArray[2].ToString());
+                                    dt.Rows[i]["代理价"] = Convert.ToInt32(plandt.Rows[j].ItemArray[2].ToString() == "" ? "0" : plandt.Rows[j].ItemArray[2].ToString()) * Convert.ToInt32(dt.Rows[i].ItemArray[2].ToString() == "" ? "0" : dt.Rows[i].ItemArray[2].ToString());
                                 }
 
                             }
