@@ -11,6 +11,7 @@ using Kingdee.BOS.Util;
 using System.Threading;
 using P2PCLIENT;
 using System.Text;
+using Kingdee.BOS.Orm.DataEntity;
 
 namespace XAYBILLEXPORT
 {
@@ -47,9 +48,41 @@ namespace XAYBILLEXPORT
 
 
             }
+            if (e.BarItemKey.EqualsIgnoreCase("tb_XXXXXXXXXX"))
 
-          
+            {
+                ClientInfo MClient = new ClientInfo("120.76.230.35", 56422, 4000, 1000, 60000, 2, "00133E02D81B");
+                MClient.ClientConnToMe += new ClientConnToHandler(client_ClientConnToMe);
+                MClient.ConToServer();
+                
+                //DataRow[] selectedRow = (this.ListModel as SysReportView).SelectedDataRows;
+                string[] FID = this.ListView.SelectedRowsInfo.GetPrimaryKeyValues();
+                DataTable dt = new DataTable();
+                DataTable dtv = new DataTable();
+                for (int i = 0; i < FID.Count(); i++)
+                {
+                    string sSQL = "select a.[FNETORDERDATE] as 日期,c.[FNAME] as 产品名称,floor(b.[FQTY]) as 数量,d.[FNUMBER] as 产品编码,floor(b.[FTAXPRICE]) as 拿货单价,floor(b.[FTAXAMOUNT]) as 结算费用,(select[FSIMPLENAME] from T_ECC_LOGISTICS_L where FID=wuliu.[FLOGISTICMODE]) as 物流公司,floor(b.[F_CAN_KDAMOUNT]) as 补快递费用,floor(b.[F_CAN_TAXAMOUNT]) as 补发票费用,a.[F_CAN_JXS] as 业务员,(select[FDATAVALUE] from T_ECC_LOGISTICSAREADETAIL_L where[FDETAILID] = addr.[FREGIONID]) as 省份 ,(select[FDATAVALUE] from T_ECC_LOGISTICSAREADETAIL_L where[FDETAILID] = addr.[FCITYID]) as 城市,(select[FDATAVALUE] from T_ECC_LOGISTICSAREADETAIL_L where[FDETAILID] = addr.[FCOUNTYID]) as 县区,addr.[FFULLADDRESS] as 地址,addr.[FRECEIVEPERSON] as 姓名,addr.[FMOBILE] as 电话,(case when(wuliu.[FLOGISTICNUM] is null or wuliu.[FLOGISTICNUM]= ' ') then a.[F_CAN_WLDH] else wuliu.[FLOGISTICNUM] end) as 物流单号 from T_ECC_NETORDER as a left join T_ECC_NETORDEREntry as b on b.[FID]= a.[FID] left join T_BD_MATERIAL_L as c on c.[FMATERIALID]=b.[FMATERIALID] left join T_BD_MATERIAL as d on d.[FMATERIALID]=b.[FMATERIALID] left join T_ECC_ADDRESS as addr on addr.[FID]=a.[FRECEIVERADDRESS] left join T_ECC_NetOrderLogisticEntry as wuliu on wuliu.[FID]=a.[FID] left join T_ECC_Logistics as Logistics on Logistics.[FID]=a.[FID] where  a.[FID]= '"+FID[i]+"'";
+                    dtv = DBServiceHelper.ExecuteDataSet(this.Context, sSQL).Tables[0];
+                    dt.Merge(dtv);
+                }
+                MemoryStream ms = new MemoryStream();
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(ms, dt);
+                byte[] tableBT = ms.ToArray();
+                Thread.Sleep(4000);
+                List<string> userlist = MClient.GetAllUser();
+                foreach (var item in userlist)
+                {
+                    MClient.SendData(item, tableBT);
+                    byte[] endByte = Encoding.Default.GetBytes("☆");
+                    MClient.SendData(item, endByte);
+                }
+
+                MClient.Mainclient.Sock.Close();
+                this.View.ShowMessage("操作成功", Kingdee.BOS.Core.DynamicForm.MessageBoxType.Notice);
+
             }
+        }
         void client_ClientConnToMe(ConClient client)
         {
             if (client.Host.Contains(this.Context.ClientInfo.IpAddress))

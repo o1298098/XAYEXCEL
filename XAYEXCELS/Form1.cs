@@ -127,7 +127,8 @@ namespace XAYEXCELS
                         p2pms.Position = 0;
                         DataTable dt = bf.Deserialize(p2pms) as DataTable;
                         dt.Columns[0].ColumnName = "日期";
-                        dt.Columns[3].ColumnName = "产品编码";
+                    dt.Columns[2].ColumnName = "产品数量";
+                    dt.Columns[3].ColumnName = "产品编码";
                         dt.Columns[4].ColumnName = "拿货单价";
                         dt.Columns[5].ColumnName = "结算费用";
                         dt.Columns[6].ColumnName = "物流公司";
@@ -440,8 +441,8 @@ namespace XAYEXCELS
                     string dtcellvalue = dtSource.Rows[i][j].ToString();
                         if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8) && dtcellvalue != "")
                         {
-
-                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                           
+                            dataRow.CreateCell(j).SetCellValue(double.Parse(dtcellvalue));
                             dataRow.Cells[j].CellStyle = style2;
                            
 
@@ -450,14 +451,14 @@ namespace XAYEXCELS
                         else if (exceltype == "2" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
                         {
 
-                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.CreateCell(j).SetCellValue(double.Parse(dtcellvalue));
                             dataRow.Cells[j].CellStyle = style2;
                             
                         }
                         else if (exceltype == "3" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
                         {
 
-                            dataRow.CreateCell(j).SetCellValue(int.Parse(dtcellvalue));
+                            dataRow.CreateCell(j).SetCellValue(double.Parse(dtcellvalue));
                             dataRow.Cells[j].CellStyle = style2;
 
                         }

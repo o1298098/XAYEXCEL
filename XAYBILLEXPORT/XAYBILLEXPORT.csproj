@@ -42,8 +42,12 @@
     <Reference Include="Kingdee.BOS.Core">
       <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Kingdee.BOS.DataEntity, Version=6.1.58.7, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Kingdee.BOS.ServiceHelper">
       <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.ServiceHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Kingdee.BOS.Web">
+      <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.Web.dll</HintPath>
     </Reference>
     <Reference Include="P2PCLIENT">
       <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCLIENT.dll</HintPath>

@@ -109,7 +109,7 @@ namespace XAYEXCELS
             objField.Orientation = XlPivotFieldOrientation.xlRowField;
             objField.Position = "1";
             int count = 1;
-            PivotField objFieldN = (PivotField)objTable.PivotFields("数量"); //赋值数据区域数据
+            PivotField objFieldN = (PivotField)objTable.PivotFields("产品数量"); //赋值数据区域数据
             objFieldN.Orientation = XlPivotFieldOrientation.xlDataField;
             objFieldN.Position = count;
             count++;
