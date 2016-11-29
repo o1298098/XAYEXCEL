@@ -18,7 +18,7 @@ using XAYEXCELS.Properties;
 using System.Text;
 
 
-namespace XAYEXCELS
+namespace XYAEXCEKSINGAL
 {
     public partial class Form1 : Form
     {
@@ -31,6 +31,7 @@ namespace XAYEXCELS
         private ClientInfo MClient { get; set; }
         MemoryStream p2pms = new MemoryStream();
         private List<UserInfo> UserList { get; set; }
+        string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
         public Form1(String[] args)
         {
            
@@ -79,7 +80,7 @@ namespace XAYEXCELS
             UserInfo user = new UserInfo();
             user.Client = client;
             user.MainClient = MClient;
-            user.Stream = new ZYSocket.share.ZYNetRingBufferPoolV2(1073741824);
+            user.Stream = new ZYSocket.share.ZYNetRingBufferPoolV2();
             client.UserToken = user;
             UserList.Add(user);
             this.BeginInvoke(new EventHandler((a, b) =>
@@ -90,8 +91,8 @@ namespace XAYEXCELS
 
          void client_ClientDataIn(string key, ConClient client, byte[] data)
         {
-            //try
-            //{
+            try
+            {
                 UserInfo user = client.UserToken as UserInfo;
 
                 if (user == null && client.IsProxy)
@@ -117,18 +118,24 @@ namespace XAYEXCELS
                 
                     user.Stream.Write(data);
                     string s = Encoding.Default.GetString(data);
-                    int index = s.LastIndexOf("☆");//这里假设的是使用"END"作为结束字符序列的
-                p2pms.Write(data, 0, data.Length);
-                    if (index > 0)
+                    int index = s.LastIndexOf("☆");
+                
+                    p2pms.Write(data, 0, data.Length);
+
+                if (index > 0)
+                {
+                    DataTable dto = ReadFromXml(sysstr + "XAYXML\\Option.xml");
+                    string username = dto.Rows[6].ItemArray[0].ToString();
+                    if (username == s.Split('☆')[1])
                     {
-                        p2pms.Position -= Encoding.Default.GetBytes("☆").Length;
+                        p2pms.Position -= Encoding.Default.GetBytes(s).Length;
                         BinaryFormatter bf = new BinaryFormatter();
                         runreplace run = new runreplace();
                         p2pms.Position = 0;
                         DataTable dt = bf.Deserialize(p2pms) as DataTable;
                         dt.Columns[0].ColumnName = "日期";
-                    dt.Columns[2].ColumnName = "产品数量";
-                    dt.Columns[3].ColumnName = "产品编码";
+                        dt.Columns[2].ColumnName = "产品数量";
+                        dt.Columns[3].ColumnName = "产品编码";
                         dt.Columns[4].ColumnName = "拿货单价";
                         dt.Columns[5].ColumnName = "结算费用";
                         dt.Columns[6].ColumnName = "物流公司";
@@ -138,48 +145,48 @@ namespace XAYEXCELS
                         dt.Columns[12].ColumnName = "区";
                         dt.Columns[14].ColumnName = "姓名";
                         dt.Columns[15].ColumnName = "手机";
-                    //dt.Columns[17].ColumnName = "注释";
-                    int timecount = 0;
-                    int timecount2 = 0;
-                    for (int i = 0; i < dt.Rows.Count; i++)
+                        //dt.Columns[17].ColumnName = "注释";
+                        int timecount = 0;
+                        int timecount2 = 0;
+                        string cityname = "上海北京天津重庆";
+                        for (int i = 0; i < dt.Rows.Count; i++)
                         {
-                        string str = dt.Rows[i].ItemArray[13].ToString();
-                        string str2;
-                        //去除地址栏的空格
-                        str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
-                        str = str.Replace(str2, "");
-                        str2 = str2.Replace(" ", "");
-                        dt.Rows[i]["地址"] = str2 + str;
-                        string product = dt.Rows[i]["产品名称"].ToString();
-                        string date = dt.Rows[i]["日期"].ToString();
-                        string productid = dt.Rows[i]["产品编码"].ToString();
-                        string Logistical = dt.Rows[i]["物流公司"].ToString() == "中通" ? "" : dt.Rows[i]["物流公司"].ToString();
-                        dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
-                        dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
-                        if (dt.Rows[i]["补快递费用"].ToString() == "0")
-                        { timecount++; }
-                        if (dt.Rows[i]["补发票费用"].ToString() == "0")
-                        { timecount2++; }
-                    }
-                    dt.Columns.Add("注释");
-                    ExcelExport(dt);
-                    dt.Columns.Add("代理价");
-                    dt=run.replacedt(dt);
-                    string sysstr = System.AppDomain.CurrentDomain.BaseDirectory;
-                    DataTable option = ReadFromXml(sysstr + "XAYXML\\Option.xml");
-                    DataTable dailidt = ReadFromXml(sysstr + "XAYXML\\DataTable.xml");
-                    string filepathInput = option.Rows[0].ItemArray[0].ToString();
-                    string filepath = option.Rows[1].ItemArray[0].ToString();
-                    string filename = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日\\代理订单"+ DateTime.Now.ToString("yyMMdd") + ".xls";
-                    ExportEasyFY(dt, filename, "1");
-                    bool KD = timecount == dt.Rows.Count;
-                    bool FP = timecount2 == dt.Rows.Count;
-                    run.ExportToProvit(filename,KD,FP);
-                    }
-                p2pms.Close();
-                p2pms = new MemoryStream();
+                            string str = dt.Rows[i].ItemArray[13].ToString();
+                            string str2;
+                            //去除地址栏的空格
+                            str2 = str.Substring(0, str.Split(' ')[0].Length + str.Split(' ')[1].Length + str.Split(' ')[2].Length + 3);
+                            str = str.Replace(str2, "");
+                            str2 = str2.Replace(" ", "");
+                            dt.Rows[i]["地址"] = str2 + str;
+                            string product = dt.Rows[i]["产品名称"].ToString();
+                            string productid = dt.Rows[i]["产品编码"].ToString();
+                            string Logistical = dt.Rows[i]["物流公司"].ToString() == "中通" ? "" : dt.Rows[i]["物流公司"].ToString();
+                            dt.Rows[i]["产品名称"] = run.productreplace(productid, product);
+                            dt.Rows[i]["物流公司"] = Logistical.Split('（')[0];
+                            if (dt.Rows[i]["补快递费用"].ToString() == "0")
+                            {
+                                timecount++;
 
-            }
+                            }
+                            if (dt.Rows[i]["补发票费用"].ToString() == "0")
+                            {
+                                timecount2++;
+                            }
+                            if (cityname.Contains(dt.Rows[i]["省"].ToString()))
+                            {
+                                dt.Rows[i]["省"] = "";
+                            }
+                        }
+                        dt = run.replacedt(dt);
+                        ExcelExport(dt);
+                      
+                    }
+                        p2pms.Close();
+                        p2pms = new MemoryStream();
+
+                    }
+
+                }
                 else
                 {
                     if (!client.IsProxy)
@@ -187,14 +194,14 @@ namespace XAYEXCELS
                         client.Sock.Close();
                     }
                 }
-            //}
-            //catch (Exception er)
-            //{
-            //    this.BeginInvoke(new EventHandler((a, b) =>
-            //    {
-            //        this.textBox1.AppendText(er.ToString() + "\r\n");
-            //    }));
-            //}
+            }
+            catch (Exception er)
+            {
+                this.BeginInvoke(new EventHandler((a, b) =>
+                {
+                    this.textBox1.AppendText(er.ToString() + "\r\n");
+                }));
+            }
         }
 
         void LogOut_Action(string message, ActionType type)
@@ -441,13 +448,27 @@ namespace XAYEXCELS
                     for (int j = 0; j < dtSource.Columns.Count; j++)
                     {
                     string dtcellvalue = dtSource.Rows[i][j].ToString();
-                        if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8) && dtcellvalue != "")
+                        if (exceltype == "1" && (j == 2 || j == 4 || j == 5 || j == 7 || j == 8||j==18) && dtcellvalue != "")
                         {
-                           
+
+                            if (dtcellvalue == "0")
+                            {
+                                dataRow.CreateCell(j).SetCellValue("");
+                            }
+                            else
+                            { 
                             dataRow.CreateCell(j).SetCellValue(double.Parse(dtcellvalue));
+                            }
                             dataRow.Cells[j].CellStyle = style2;
                            
 
+
+                        }
+                        else if (exceltype == "1" && (j == 0) && dtcellvalue != "")
+                        {
+
+                            dataRow.CreateCell(j).SetCellValue(dtcellvalue.Split(' ')[0]);
+                            dataRow.Cells[j].CellStyle = style2;
 
                         }
                         else if (exceltype == "2" && (j == 2 || j == 5 || j == 6) && dtcellvalue != "")
@@ -708,6 +729,7 @@ namespace XAYEXCELS
                 restartemail[time1] = data[i];
                 time1++;
             }
+               
             }
 
 
@@ -775,7 +797,6 @@ namespace XAYEXCELS
             {
                 runreplace run = new runreplace();
                 ExcelExport(dt);
-                dt.Columns.Add("代理价");
                 run.replacedt(dt);
                 dt.Columns[0].ColumnName = "日期";
                 dt.Columns[3].ColumnName = "产品编码";
@@ -811,16 +832,16 @@ namespace XAYEXCELS
             string filepathInput = option.Rows[0].ItemArray[0].ToString();
             string filepath = option.Rows[1].ItemArray[0].ToString();
             string daydir = filepath + "\\" + DateTime.Now.Date.ToString("yyyy.MM") + "\\" + DateTime.Now.Date.ToString("dd") + "日";           
-            string dailidir = daydir + "\\" + "单号表";
-            string totaldir = daydir + "\\" + "汇总表";
+            //string dailidir = daydir + "\\" + "单号表";
+            string totaldir = daydir + "\\" + "订单表";
             emailtime = 0;            
-            if (!Directory.Exists(dailidir))
-                Directory.CreateDirectory(dailidir);
+            //if (!Directory.Exists(dailidir))
+            //    Directory.CreateDirectory(dailidir);
             if (!Directory.Exists(totaldir))
-                Directory.CreateDirectory(totaldir);           
-            dt.DefaultView.Sort = "业务员 DESC";
+                Directory.CreateDirectory(totaldir);
+            //dt.DefaultView.Sort = "业务员 DESC";
             dt = dt.DefaultView.ToTable();
-            string strFileName = totaldir + "\\汇总表" + DateTime.Now.ToString("yyMMdd") + ".xls";
+            string strFileName = filepath + "\\" + DateTime.Now.ToString("yyMMddHHmmssfff") + ".xls";
             string autoemail = option.Rows[2].ItemArray[0].ToString();
             
             ExportEasy(dt, strFileName, "1");
@@ -828,49 +849,49 @@ namespace XAYEXCELS
             TimeSpan timeSpan = stopwatch.Elapsed;
             double seconds = timeSpan.TotalSeconds;
             log = log + DateTime.Now.ToLongTimeString() + "  共合并" + dt.Rows.Count + "行" + "，耗时" + seconds + "秒\r\n";
-            string[] emailarr = new string[dailidt.Rows.Count];
-            for (int k = 0; k < dailidt.Rows.Count; k++)
-            {
-                string daili = dailidt.Rows[k][0].ToString();
-                string email = dailidt.Rows[k][1].ToString();
-                string email2 = dailidt.Rows[k][2].ToString();
-                string emailSubject = dailidt.Rows[k][3].ToString();
-                string emailBody = dailidt.Rows[k][4].ToString();
-                string daili2 = dailidt.Rows[k][5].ToString();
-                DataRow[] drArr;
-                if (daili2 == "")
-                {
-                    drArr = dt.Select("业务员 LIKE '" + daili.Substring(0, 1) + "%'");
-                }
-                else
-                {
-                    drArr = dt.Select("业务员 LIKE '" + daili2.Substring(0, 1) + "%' and 业务员 Like '%" + daili + "%' ");
-                }
+            //string[] emailarr = new string[dailidt.Rows.Count];
+            //for (int k = 0; k < dailidt.Rows.Count; k++)
+            //{
+            //    string daili = dailidt.Rows[k][0].ToString();
+            //    string email = dailidt.Rows[k][1].ToString();
+            //    string email2 = dailidt.Rows[k][2].ToString();
+            //    string emailSubject = dailidt.Rows[k][3].ToString();
+            //    string emailBody = dailidt.Rows[k][4].ToString();
+            //    string daili2 = dailidt.Rows[k][5].ToString();
+            //    DataRow[] drArr;
+            //    if (daili2 == "")
+            //    {
+            //        drArr = dt.Select("业务员 LIKE '" + daili.Substring(0, 1) + "%'");
+            //    }
+            //    else
+            //    {
+            //        drArr = dt.Select("业务员 LIKE '" + daili2.Substring(0, 1) + "%' and 业务员 Like '%" + daili + "%' ");
+            //    }
 
-                DataTable dtNew = dt.Clone();
-                if (drArr.Length == 0)
-                    continue;
-                for (int i = 0; i < drArr.Length; i++)
-                {
-                    dtNew.ImportRow(drArr[i]);
-                }
-                dtNew.Columns.Remove("结算费用");
-                dtNew.Columns.Remove("拿货单价");
-                dtNew.Columns.Remove("注释");
-                strFileName = dailidir + "\\" + emailSubject + "(" + DateTime.Now.ToString("M.dd") + ").xls";
-                ExportEasy(dtNew, strFileName, "2");
-                string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" + email2;
-                emailarg[emailtime] = data;
-                emailarr[k] = data;
-                emailtime++;
-            }
-            if (autoemail == "True")
-            {
-                Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
-                t1.IsBackground = true;
-                t1.Start(emailarr);
-                //MultiSendEmail(data);
-            }
+            //    DataTable dtNew = dt.Clone();
+            //    if (drArr.Length == 0)
+            ////        continue;
+            ////    for (int i = 0; i < drArr.Length; i++)
+            ////    {
+            ////        dtNew.ImportRow(drArr[i]);
+            ////    }
+            ////    dtNew.Columns.Remove("结算费用");
+            ////    dtNew.Columns.Remove("拿货单价");
+            ////    dtNew.Columns.Remove("注释");
+            ////    strFileName = dailidir + "\\" + emailSubject + "(" + DateTime.Now.ToString("M.dd") + ").xls";
+            ////    ExportEasy(dtNew, strFileName, "2");
+            ////    string data = email + "☆" + strFileName + "☆" + emailSubject + "☆" + emailBody + "☆" + daili + "☆" + email2;
+            ////    emailarg[emailtime] = data;
+            ////    emailarr[k] = data;
+            ////    emailtime++;
+            //}
+            //if (autoemail == "True")
+            //{
+            //    Thread t1 = new Thread(new ParameterizedThreadStart(MultiSendEmail));
+            //    t1.IsBackground = true;
+            //    t1.Start(emailarr);
+            //    //MultiSendEmail(data);
+            //}
             //notifyIcon1.ShowBalloonTip(3000,"提示", textBox1.Text, ToolTipIcon.None);
         }
         private void ExcelExportSH(DataTable dt)

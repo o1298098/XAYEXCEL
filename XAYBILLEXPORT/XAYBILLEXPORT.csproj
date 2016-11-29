@@ -49,14 +49,9 @@
     <Reference Include="Kingdee.BOS.Web">
       <HintPath>E:\软件\k3\WebSite\Bin\Kingdee.BOS.Web.dll</HintPath>
     </Reference>
-    <Reference Include="P2PCLIENT">
-      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCLIENT.dll</HintPath>
-    </Reference>
-    <Reference Include="P2PCMD">
-      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\P2PCMD.dll</HintPath>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\protobuf-net.dll</HintPath>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\实例\ZYSOCKET-master\DEMO\TestZYNet\TestZYNetClient\bin\Debug\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,11 +62,12 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="ZYSocketClientB">
-      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\ZYSocketClientB.dll</HintPath>
+    <Reference Include="ZYNetClient">
+      <HintPath>..\..\..\实例\ZYSOCKET-master\DEMO\TestZYNet\TestZYNetClient\bin\Debug\ZYNetClient.dll</HintPath>
     </Reference>
-    <Reference Include="ZYSocketShare">
-      <HintPath>..\..\..\UDPTCP\TCPP2P\P2PCLIENT\P2PCLIENT\bin\Debug\ZYSocketShare.dll</HintPath>
+    <Reference Include="ZYSocketShare, Version=0.4.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\实例\ZYSOCKET-master\DEMO\TestZYNet\TestZYNetClient\bin\Debug\ZYSocketShare.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
